@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Word Search Battle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --surface: #12121a; --border: #2a2a3a;
+      --accent: #e8ff47; --accent2: #ff4e6a; --text: #f0f0f0; --muted: #666688;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Space Mono', monospace; min-height: 100vh; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: linear-gradient(rgba(232,255,71,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(232,255,71,0.025) 1px, transparent 1px);
+      background-size: 40px 40px; pointer-events: none;
+    }
+    header { border-bottom: 1px solid var(--border); padding: 1.2rem 3rem; display: flex; align-items: center; gap: 2rem; }
+    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 4px; color: var(--accent); text-decoration: none; }
+    .logo span { color: var(--accent2); }
+    nav a { font-size: 0.7rem; color: var(--muted); text-decoration: none; letter-spacing: 1px; text-transform: uppercase; }
+    nav a:hover { color: var(--text); }
+
+    .hero { max-width: 860px; margin: 4rem auto; padding: 0 2rem; text-align: center; }
+    .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: 5rem; letter-spacing: 4px; line-height: 1; }
+    .hero h1 span { color: var(--accent2); }
+    .hero p { color: var(--muted); font-size: 0.8rem; line-height: 1.8; margin: 1.5rem auto; max-width: 600px; }
+
+    .cta-row { display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--accent); color: var(--bg); font-family: 'Space Mono', monospace;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      padding: 1rem 2rem; border: none; cursor: pointer; transition: 0.2s;
+    }
+    .btn-primary:hover { background: #fff; }
+    .btn-secondary {
+      background: transparent; color: var(--text); font-family: 'Space Mono', monospace;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      padding: 1rem 2rem; border: 1px solid var(--border); cursor: pointer; transition: 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .rules { max-width: 900px; margin: 0 auto 4rem; padding: 0 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .rule-card { background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; }
+    .rule-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 2px; margin-bottom: 0.8rem; color: var(--accent); }
+    .rule-card p, .rule-card li { font-size: 0.72rem; color: var(--muted); line-height: 1.8; }
+    .rule-card ol { padding-left: 1.2rem; }
+    .rule-card li { margin-bottom: 0.3rem; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      z-index: 100; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--border); padding: 2.5rem; width: 400px; max-width: 95vw; }
+    .modal h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 3px; margin-bottom: 1.5rem; }
+    .modal h2 span { color: var(--accent); }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+    .form-group input {
+      width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text);
+      font-family: 'Space Mono', monospace; font-size: 0.85rem; padding: 0.7rem 1rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: var(--accent); }
+    .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; }
+    .modal-actions .btn-primary { flex: 1; }
+    .modal-actions .btn-cancel {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'Space Mono', monospace; font-size: 0.75rem; padding: 0.7rem 1rem; cursor: pointer;
+    }
+    .modal-actions .btn-cancel:hover { border-color: var(--accent2); color: var(--accent2); }
+    .error-msg { color: var(--accent2); font-size: 0.7rem; margin-top: 0.8rem; display: none; }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 3rem; }
+      .rules { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">GAME<span>HUB</span></a>
+    <nav><a href="/">← Back to Games</a></nav>
+  </header>
+
+  <div class="hero">
+    <h1>WORD SEARCH <span>BATTLE</span></h1>
+    <p>Find hidden words faster than your opponents in this free real-time multiplayer puzzle. Create a game, share the code with friends, and compete live — the player who finds the most words wins!</p>
+    <div class="cta-row">
+      <button class="btn-primary" onclick="openModal('create')">Create New Game</button>
+      <button class="btn-secondary" onclick="openModal('join')">Join with Code</button>
+    </div>
+  </div>
+
+  <div class="rules">
+    <div class="rule-card">
+      <h3>How to Play</h3>
+      <p>Find and mark all hidden words in the grid. Words can go horizontal, vertical, diagonal, and even backwards. Click and drag (or tap) to select a word. When you find a word another player sees it highlighted immediately.</p>
+    </div>
+    <div class="rule-card">
+      <h3>Battle Mode</h3>
+      <p>Every player has the same puzzle at the same time. Found words are locked so opponents can't steal them. The player who finds the <strong style="color:var(--text)">most words wins</strong>. Play multiple rounds without leaving!</p>
+    </div>
+    <div class="rule-card">
+      <h3>How to Start</h3>
+      <ol>
+        <li>Click <strong style="color:var(--text)">Create New Game</strong></li>
+        <li>Enter your name to get a Game Code</li>
+        <li>Share the code with friends</li>
+        <li>They click <strong style="color:var(--text)">Join with Code</strong></li>
+        <li>Host starts the game when everyone is ready</li>
+      </ol>
+    </div>
+    <div class="rule-card">
+      <h3>Play Again</h3>
+      <p>After each game ends, the host can click <strong style="color:var(--text)">Play Again</strong> to start a fresh puzzle with the same group. No need to share a new code — everyone stays in the session!</p>
+    </div>
+  </div>
+
+  <!-- Create Game Modal -->
+  <div class="modal-overlay" id="createModal">
+    <div class="modal">
+      <h2>CREATE <span>GAME</span></h2>
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" id="createName" placeholder="Enter your name..." maxlength="20" />
+      </div>
+      <div class="error-msg" id="createError"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('create')">Cancel</button>
+        <button class="btn-primary" onclick="createGame()">Create Game →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Game Modal -->
+  <div class="modal-overlay" id="joinModal">
+    <div class="modal">
+      <h2>JOIN <span>GAME</span></h2>
+      <div class="form-group">
+        <label>Game Code</label>
+        <input type="text" id="joinCode" placeholder="Enter 6-character code..." maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:1.2rem;" />
+      </div>
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" id="joinName" placeholder="Enter your name..." maxlength="20" />
+      </div>
+      <div class="error-msg" id="joinError"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('join')">Cancel</button>
+        <button class="btn-primary" onclick="joinGame()">Join Game →</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openModal(type) {
+      document.getElementById(type + 'Modal').classList.add('open');
+      setTimeout(() => document.getElementById(type === 'create' ? 'createName' : 'joinCode').focus(), 100);
+    }
+    function closeModal(type) {
+      document.getElementById(type + 'Modal').classList.remove('open');
+    }
+
+    document.getElementById('createName').addEventListener('keydown', e => { if(e.key==='Enter') createGame(); });
+    document.getElementById('joinName').addEventListener('keydown', e => { if(e.key==='Enter') joinGame(); });
+    document.getElementById('joinCode').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase(); });
+
+    async function createGame() {
+      const name = document.getElementById('createName').value.trim();
+      const err = document.getElementById('createError');
+      if (!name) { showError(err, 'Please enter your name.'); return; }
+      err.style.display = 'none';
+
+      const res = await fetch('/games/word-search-battle/create', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerName: name })
+      });
+      const data = await res.json();
+      if (data.success) {
+        sessionStorage.setItem('playerName', name);
+        sessionStorage.setItem('gameCode', data.gameCode);
+        window.location.href = '/games/word-search-battle/game/' + data.gameCode;
+      } else {
+        showError(err, data.error);
+      }
+    }
+
+    async function joinGame() {
+      const code = document.getElementById('joinCode').value.trim().toUpperCase();
+      const name = document.getElementById('joinName').value.trim();
+      const err = document.getElementById('joinError');
+      if (!code || code.length < 4) { showError(err, 'Please enter a valid game code.'); return; }
+      if (!name) { showError(err, 'Please enter your name.'); return; }
+      err.style.display = 'none';
+
+      const res = await fetch('/games/word-search-battle/join', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gameCode: code, playerName: name })
+      });
+      const data = await res.json();
+      if (data.success) {
+        sessionStorage.setItem('playerName', name);
+        sessionStorage.setItem('gameCode', data.gameCode);
+        window.location.href = '/games/word-search-battle/game/' + data.gameCode;
+      } else {
+        showError(err, data.error);
+      }
+    }
+
+    function showError(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+  </script>
+</body>
+</html>

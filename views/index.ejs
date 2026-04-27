@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Game Arcade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #2a2a3a;
+      --accent: #e8ff47;
+      --accent2: #ff4e6a;
+      --text: #f0f0f0;
+      --muted: #666688;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(232,255,71,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(232,255,71,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 4px;
+      color: var(--accent);
+    }
+
+    .logo span { color: var(--accent2); }
+
+    .tagline {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    .section-header {
+      margin-bottom: 3rem;
+    }
+
+    .section-header h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      letter-spacing: 3px;
+      line-height: 1;
+    }
+
+    .section-header p {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      letter-spacing: 1px;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .game-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .game-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .game-card:hover .card-glow {
+      opacity: 1;
+    }
+
+    .card-glow {
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(135deg, rgba(232,255,71,0.1), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .card-art {
+      height: 180px;
+      background: #0d0d15;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .word-grid-art {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+      opacity: 0.4;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      color: var(--accent);
+    }
+
+    .word-grid-art span { text-align: center; }
+    .word-grid-art span.hl { color: var(--accent2); opacity: 1; }
+
+    .badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--accent2);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 0.2rem 0.6rem;
+      text-transform: uppercase;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .card-body h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-body p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .card-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .tag {
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+      background: var(--bg);
+      padding: 0.2rem 0.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .play-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 0.4rem 1rem;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .play-btn:hover { background: #fff; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .game-card { animation: fadeUp 0.5s ease both; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="logo">GAME<span>HUB</span></div>
+    </div>
+    <div class="tagline">Play · Compete · Win</div>
+  </header>
+
+  <main>
+    <div class="section-header">
+      <h2>AVAILABLE GAMES</h2>
+      <p>// choose your battle — more games coming soon</p>
+    </div>
+
+    <div class="games-grid">
+      <a href="/games/word-search-battle" class="game-card">
+        <div class="card-glow"></div>
+        <div class="card-art">
+          <div class="badge">Multiplayer</div>
+          <div class="word-grid-art">
+            <span>W</span><span class="hl">B</span><span>A</span><span>T</span><span>T</span><span class="hl">L</span><span>E</span><span>X</span>
+            <span>O</span><span>R</span><span>D</span><span>Q</span><span>Z</span><span>K</span><span>M</span><span>P</span>
+            <span>R</span><span class="hl">S</span><span>E</span><span>A</span><span class="hl">R</span><span>C</span><span>H</span><span>N</span>
+            <span class="hl">D</span><span>U</span><span>Z</span><span class="hl">S</span><span>C</span><span>O</span><span>R</span><span>E</span>
+            <span>F</span><span>I</span><span>N</span><span>D</span><span>X</span><span>W</span><span>I</span><span>N</span>
+            <span>G</span><span>R</span><span>I</span><span>D</span><span>L</span><span>Y</span><span>O</span><span>U</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>WORD SEARCH BATTLE</h3>
+          <p>Real-time multiplayer puzzle. Find hidden words faster than your opponents. Create a game, share the code, and compete live.</p>
+        </div>
+        <div class="card-footer">
+          <div style="display:flex;gap:0.5rem;">
+            <span class="tag">Real-Time</span>
+            <span class="tag">2–8 Players</span>
+          </div>
+          <button class="play-btn">Play Now →</button>
+        </div>
+      </a>
+    </div>
+  </main>
+</body>
+</html>
