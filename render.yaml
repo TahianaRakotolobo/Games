@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: word-search-battle
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false   # You will paste this manually in the Render dashboard
