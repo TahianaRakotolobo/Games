@@ -159,6 +159,7 @@
     let startCell = null;
     let currentSelection = [];
     let foundCells = {}; // key: "r-c", value: 'mine' | 'other'
+    let gridListenersAttached = false;
 
     if (!PLAYER_NAME) {
       window.location.href = '/games/word-search-battle';
@@ -183,6 +184,7 @@
       gameState = state;
       document.getElementById('lobbyOverlay').style.display = 'none';
       updateStatusPill('playing');
+      attachGridListeners();
       renderAll();
     });
 
@@ -190,13 +192,13 @@
       gameState.players = players;
       const wordEntry = gameState.words.find(w => w.word === word);
       if (wordEntry) { wordEntry.foundBy = playerName; wordEntry.positions = positions; }
-      renderPlayers();
-      renderWords();
       // Mark cells
       positions.forEach(pos => {
         const key = pos.row + '-' + pos.col;
         foundCells[key] = (playerName === PLAYER_NAME) ? 'mine' : 'other';
       });
+      renderPlayers();
+      renderWords();
       renderGrid();
       if (gameOver) showGameOver(winner, finalScores);
     });
@@ -207,15 +209,9 @@
     });
 
     function renderAll() {
-      renderGrid();
-      renderWords();
-      renderPlayers();
-      renderLobby();
-
-      if (gameState.status === 'playing') {
-        document.getElementById('lobbyOverlay').style.display = 'none';
-        updateStatusPill('playing');
-        // Rebuild found cells from word data
+      // Rebuild foundCells from saved word state (for reconnects / late joiners)
+      foundCells = {};
+      if (gameState.words) {
         gameState.words.forEach(w => {
           if (w.foundBy && w.positions) {
             w.positions.forEach(pos => {
@@ -224,12 +220,37 @@
             });
           }
         });
-        renderGrid();
+      }
+
+      renderGrid();
+      renderWords();
+      renderPlayers();
+
+      if (gameState.status === 'waiting') {
+        renderLobby();
+      } else if (gameState.status === 'playing') {
+        document.getElementById('lobbyOverlay').style.display = 'none';
+        updateStatusPill('playing');
+        attachGridListeners();
       } else if (gameState.status === 'finished') {
         document.getElementById('lobbyOverlay').style.display = 'none';
         const scores = gameState.players.map(p => ({ name: p.name, score: p.score }));
         showGameOver(gameState.winner, scores);
       }
+    }
+
+    // Attach grid interaction listeners exactly once
+    function attachGridListeners() {
+      if (gridListenersAttached) return;
+      gridListenersAttached = true;
+      const el = document.getElementById('wordGrid');
+      el.addEventListener('mousedown', onMouseDown);
+      el.addEventListener('mouseover', onMouseOver);
+      el.addEventListener('mouseup', onMouseUp);
+      document.addEventListener('mouseup', onMouseUp); // catch release outside grid
+      el.addEventListener('touchstart', onTouchStart, { passive: false });
+      el.addEventListener('touchmove', onTouchMove, { passive: false });
+      el.addEventListener('touchend', onTouchEnd);
     }
 
     function renderGrid() {
@@ -253,15 +274,6 @@
           if (currentSelection.some(s => s.r == r && s.c == c)) cell.classList.add('selecting');
           el.appendChild(cell);
         }
-      }
-
-      if (gameState.status === 'playing') {
-        el.addEventListener('mousedown', onMouseDown);
-        el.addEventListener('mouseover', onMouseOver);
-        el.addEventListener('mouseup', onMouseUp);
-        el.addEventListener('touchstart', onTouchStart, { passive: false });
-        el.addEventListener('touchmove', onTouchMove, { passive: false });
-        el.addEventListener('touchend', onTouchEnd);
       }
     }
 

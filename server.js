@@ -131,8 +131,8 @@ function buildGameState(game) {
     grid: game.grid,
     words: game.words.map(w => ({
       word: w.word,
-      foundBy: w.foundBy,
-      positions: w.foundBy ? w.positions : []
+      foundBy: w.foundBy || null,
+      positions: w.positions || []  // always send positions; client ignores them for unfound words
     })),
     players: game.players.map(p => ({ name: p.name, score: p.score, isHost: p.isHost, wordsFound: p.wordsFound })),
     winner: game.winner,
