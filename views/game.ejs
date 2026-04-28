@@ -8,95 +8,214 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg: #0a0a0f; --surface: #12121a; --border: #2a2a3a;
-      --accent: #e8ff47; --accent2: #ff4e6a; --text: #f0f0f0; --muted: #666688;
+      --bg:      #fafafa;
+      --surface: #e9e9e9;
+      --border:  #b9ade6;
+      --accent:  #764976;
+      --accent2: #5c5a9f;
+      --text:    #1e1030;
+      --muted:   #7a6e99;
     }
-    body { background: var(--bg); color: var(--text); font-family: 'Space Mono', monospace; min-height: 100vh; display: flex; flex-direction: column; }
 
-    header { border-bottom: 1px solid var(--border); padding: 0.8rem 1.5rem; display: flex; align-items: center; gap: 2rem; flex-shrink: 0; }
-    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 3px; color: var(--accent); text-decoration: none; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── header ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-shrink: 0;
+      background: var(--bg);
+    }
+    .logo { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:3px; color:var(--accent); text-decoration:none; }
     .logo span { color: var(--accent2); }
-    .code-badge { font-size: 0.65rem; color: var(--muted); letter-spacing: 2px; }
-    .code-badge strong { color: var(--accent); font-size: 0.9rem; letter-spacing: 4px; cursor: pointer; }
-    .code-badge strong:hover { text-decoration: underline; }
-    .status-pill { margin-left: auto; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; padding: 0.25rem 0.7rem; border: 1px solid; }
-    .status-pill.waiting { border-color: var(--muted); color: var(--muted); }
-    .status-pill.playing { border-color: var(--accent); color: var(--accent); }
-    .status-pill.finished { border-color: var(--accent2); color: var(--accent2); }
+    .code-badge { font-size:0.65rem; color:var(--muted); letter-spacing:2px; }
+    .code-badge strong { color:var(--accent); font-size:0.9rem; letter-spacing:4px; cursor:pointer; }
+    .code-badge strong:hover { text-decoration:underline; }
+    .status-pill { margin-left:auto; font-size:0.6rem; letter-spacing:2px; text-transform:uppercase; padding:0.25rem 0.7rem; border:1px solid; }
+    .status-pill.waiting  { border-color:var(--muted);   color:var(--muted);   }
+    .status-pill.playing  { border-color:var(--accent);  color:var(--accent);  }
+    .status-pill.finished { border-color:var(--accent2); color:var(--accent2); }
 
-    .layout { display: flex; flex: 1; overflow: hidden; }
-    .sidebar { width: 240px; flex-shrink: 0; border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-    .sidebar-section { padding: 1rem; border-bottom: 1px solid var(--border); }
-    .sidebar-title { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 0.7rem; }
-    .player-item { display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0; }
-    .player-name { font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; }
-    .player-name .crown { color: var(--accent); font-size: 0.6rem; }
-    .player-name .me { color: var(--accent2); font-size: 0.55rem; border: 1px solid var(--accent2); padding: 0.1rem 0.3rem; }
-    .player-score { font-size: 0.85rem; font-weight: 700; color: var(--accent); }
-    .words-list { flex: 1; overflow-y: auto; padding: 1rem; }
-    .word-item {
-      font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase;
-      padding: 0.4rem 0.6rem; margin-bottom: 0.3rem; border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; transition: 0.2s;
+    /* ── layout ── */
+    .layout { display:flex; flex:1; overflow:hidden; }
+
+    /* ── sidebar ── */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--surface);
     }
-    .word-item.found { border-color: transparent; opacity: 0.6; text-decoration: line-through; }
-    .word-item .found-by { font-size: 0.55rem; color: var(--muted); }
-    .word-item.found-by-me { border-color: var(--accent2); opacity: 1; text-decoration: none; }
-    .word-item.found-by-me .found-by { color: var(--accent2); }
+    .sidebar-section { padding:1rem; border-bottom:1px solid var(--border); }
+    .sidebar-title { font-size:0.58rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:0.7rem; font-weight:700; }
 
-    .game-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 1rem; overflow: auto; }
-    .grid-wrap { position: relative; }
+    .player-item { display:flex; align-items:center; justify-content:space-between; padding:0.35rem 0; }
+    .player-name { font-size:0.7rem; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap; }
+    .player-name .crown { color:var(--accent); }
+    .player-name .me { color:var(--accent2); font-size:0.52rem; border:1px solid var(--accent2); padding:0.1rem 0.25rem; }
+    .player-score { font-size:0.9rem; font-weight:700; color:var(--accent); }
+
+    /* words list */
+    .words-section {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .words-header {
+      padding: 0.8rem 1rem 0.4rem;
+      font-size: 0.58rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+    }
+    .words-body { padding: 0.5rem; }
+    .word-item {
+      font-size: 0.68rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0.35rem 0.6rem;
+      margin-bottom: 0.25rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      transition: all 0.2s;
+    }
+    .word-item.found-other {
+      border-color: var(--border);
+      background: var(--surface);
+      opacity: 0.55;
+      text-decoration: line-through;
+    }
+    .word-item.found-mine {
+      border-color: var(--accent);
+      background: rgba(118,73,118,0.08);
+      opacity: 1;
+    }
+    .word-item .found-by { font-size:0.52rem; color:var(--muted); margin-left:0.3rem; white-space:nowrap; }
+    .word-item.found-mine .found-by { color:var(--accent); }
+
+    /* ── grid area ── */
+    .game-area { flex:1; display:flex; align-items:center; justify-content:center; padding:1rem; overflow:auto; background:var(--bg); }
     #wordGrid {
-      display: grid; border: 1px solid var(--border); cursor: crosshair;
-      user-select: none; -webkit-user-select: none;
+      display: grid;
+      border: 2px solid var(--border);
+      cursor: crosshair;
+      user-select: none;
+      -webkit-user-select: none;
+      background: var(--surface);
     }
     .cell {
-      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-      font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 1px;
-      color: var(--text); border: 1px solid rgba(255,255,255,0.04); transition: background 0.1s;
-      position: relative;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem; letter-spacing: 1px;
+      color: var(--text);
+      border: 1px solid rgba(185,173,230,0.25);
+      transition: background 0.08s, color 0.08s;
     }
-    .cell.selecting { background: rgba(232,255,71,0.15); color: var(--accent); }
-    .cell.found-mine { background: rgba(255,78,106,0.2); color: var(--accent2); }
-    .cell.found-other { background: rgba(100,100,150,0.2); color: var(--muted); }
+    .cell.selecting   { background: rgba(118,73,118,0.18); color: var(--accent); }
+    .cell.found-mine  { background: rgba(118,73,118,0.22); color: var(--accent);  font-weight: bold; }
+    .cell.found-other { background: rgba(92,90,159,0.15);  color: var(--accent2); }
 
-    .lobby-overlay, .game-over-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 50;
+    /* ── overlays ── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(30,16,48,0.55);
+      backdrop-filter: blur(3px);
+      z-index: 50;
       display: flex; align-items: center; justify-content: center;
     }
-    .lobby-box, .game-over-box {
-      background: var(--surface); border: 1px solid var(--border);
-      padding: 2.5rem; width: 480px; max-width: 95vw; text-align: center;
+    .overlay-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      width: 460px; max-width: 95vw;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(118,73,118,0.15);
     }
-    .lobby-box h2, .game-over-box h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 3px; }
-    .lobby-code { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 8px; color: var(--accent); margin: 1rem 0; cursor: pointer; }
-    .lobby-code:hover { text-decoration: underline; }
-    .lobby-hint { font-size: 0.65rem; color: var(--muted); letter-spacing: 1px; }
-    .lobby-players { margin: 1.5rem 0; text-align: left; }
-    .lobby-player { padding: 0.5rem 0.8rem; border: 1px solid var(--border); margin-bottom: 0.3rem; font-size: 0.75rem; display: flex; justify-content: space-between; }
-    .lobby-player .host-tag { font-size: 0.55rem; color: var(--accent); border: 1px solid var(--accent); padding: 0.1rem 0.3rem; }
-    .btn { font-family: 'Space Mono', monospace; font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 0.9rem 2rem; border: none; cursor: pointer; transition: 0.2s; }
-    .btn-accent { background: var(--accent); color: var(--bg); }
-    .btn-accent:hover { background: #fff; }
-    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
-    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .overlay-box h2 { font-family:'Bebas Neue',sans-serif; font-size:2.2rem; letter-spacing:3px; color:var(--text); }
+    .lobby-code {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem; letter-spacing: 8px;
+      color: var(--accent); margin: 1rem 0;
+      cursor: pointer;
+    }
+    .lobby-code:hover { opacity: 0.8; }
+    .lobby-hint { font-size:0.62rem; color:var(--muted); letter-spacing:1px; margin-bottom:1.5rem; }
+    .lobby-players { margin-bottom:1.5rem; text-align:left; }
+    .lobby-player {
+      padding: 0.45rem 0.8rem;
+      border: 1px solid var(--border);
+      margin-bottom: 0.3rem;
+      font-size: 0.72rem;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--surface);
+    }
+    .host-tag { font-size:0.52rem; color:var(--accent); border:1px solid var(--accent); padding:0.1rem 0.3rem; }
 
-    .score-list { margin: 1.5rem 0; }
-    .score-item { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.8rem; margin-bottom: 0.3rem; border: 1px solid var(--border); }
-    .score-item.winner { border-color: var(--accent); background: rgba(232,255,71,0.05); }
-    .score-item .rank { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--muted); margin-right: 1rem; }
-    .score-item .sname { font-size: 0.8rem; }
-    .score-item .sscore { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; color: var(--accent); }
-    .winner-badge { font-size: 0.6rem; border: 1px solid var(--accent); color: var(--accent); padding: 0.1rem 0.4rem; letter-spacing: 1px; }
+    .btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+      padding: 0.85rem 1.8rem; border: none; cursor: pointer; transition: 0.2s;
+    }
+    .btn-accent  { background:var(--accent);  color:#fff; }
+    .btn-accent:hover  { background:var(--accent2); }
+    .btn-outline { background:transparent; border:1px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
 
-    .copied-toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--accent); color: var(--bg); padding: 0.7rem 1.2rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200; }
-    .copied-toast.show { opacity: 1; }
+    /* game over */
+    .score-list { margin:1.2rem 0; }
+    .score-item {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0.55rem 0.8rem; margin-bottom:0.3rem;
+      border:1px solid var(--border); background:var(--surface);
+    }
+    .score-item.winner { border-color:var(--accent); background:rgba(118,73,118,0.07); }
+    .score-item .rank  { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; color:var(--muted); margin-right:0.8rem; }
+    .score-item .sname { font-size:0.78rem; }
+    .score-item .sscore { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; color:var(--accent); }
+    .winner-badge { font-size:0.55rem; border:1px solid var(--accent); color:var(--accent); padding:0.1rem 0.35rem; letter-spacing:1px; margin-left:0.4rem; }
+
+    /* toast */
+    .copied-toast {
+      position:fixed; bottom:2rem; right:2rem;
+      background:var(--accent); color:#fff;
+      padding:0.6rem 1.1rem; font-size:0.68rem; font-weight:700; letter-spacing:1px;
+      opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:200;
+    }
+    .copied-toast.show { opacity:1; }
+
+    /* waiting state hint */
+    #waitingHint { font-size:0.7rem; color:var(--muted); margin-top:0.8rem; }
 
     @media (max-width: 700px) {
-      .sidebar { width: 180px; }
-      .cell { width: 26px; height: 26px; font-size: 0.8rem; }
+      .sidebar { width: 160px; }
+      .cell { width:24px; height:24px; font-size:0.78rem; }
     }
   </style>
 </head>
@@ -113,32 +232,33 @@
         <div class="sidebar-title">Players</div>
         <div id="playersList"></div>
       </div>
-      <div class="words-list" id="wordsList"></div>
+      <div class="words-section">
+        <div class="words-header" id="wordsHeader">Words</div>
+        <div class="words-body" id="wordsBody"></div>
+      </div>
     </div>
     <div class="game-area">
-      <div class="grid-wrap">
-        <div id="wordGrid"></div>
-      </div>
+      <div id="wordGrid"></div>
     </div>
   </div>
 
   <!-- Lobby overlay -->
-  <div class="lobby-overlay" id="lobbyOverlay">
-    <div class="lobby-box">
+  <div class="overlay" id="lobbyOverlay">
+    <div class="overlay-box">
       <h2>GAME LOBBY</h2>
       <div class="lobby-code" onclick="copyCode()" title="Click to copy"><%= gameCode %></div>
-      <div class="lobby-hint">// Share this code with your friends to join</div>
+      <div class="lobby-hint">Share this code with your friends to join</div>
       <div class="lobby-players" id="lobbyPlayers"></div>
       <button class="btn btn-accent" id="startBtn" onclick="startGame()" style="display:none">Start Game →</button>
-      <div id="waitingMsg" style="font-size:0.72rem;color:var(--muted);">Waiting for host to start...</div>
+      <div id="waitingHint">Waiting for host to start the game…</div>
     </div>
   </div>
 
   <!-- Game Over overlay -->
-  <div class="game-over-overlay" id="gameOverOverlay" style="display:none">
-    <div class="game-over-box">
+  <div class="overlay" id="gameOverOverlay" style="display:none">
+    <div class="overlay-box">
       <h2>GAME OVER</h2>
-      <div id="winnerAnnounce" style="margin:0.5rem 0 1.5rem;font-size:0.75rem;color:var(--muted);"></div>
+      <div id="winnerAnnounce" style="margin:0.4rem 0 1.2rem;font-size:0.75rem;color:var(--muted);"></div>
       <div class="score-list" id="finalScores"></div>
       <div style="display:flex;gap:1rem;justify-content:center;margin-top:1.5rem;">
         <button class="btn btn-accent" id="playAgainBtn" onclick="playAgain()" style="display:none">Play Again →</button>
@@ -151,19 +271,22 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    const GAME_CODE = '<%= gameCode %>';
+    const GAME_CODE   = '<%= gameCode %>';
     const PLAYER_NAME = sessionStorage.getItem('playerName') || '';
+
     let isHost = false;
     let gameState = null;
     let selecting = false;
     let startCell = null;
     let currentSelection = [];
-    let foundCells = {}; // key: "r-c", value: 'mine' | 'other'
+    let foundCells = {};            // "r-c" → 'mine' | 'other'
     let gridListenersAttached = false;
 
     if (!PLAYER_NAME) {
       window.location.href = '/games/word-search-battle';
     }
+
+    // ── socket ────────────────────────────────────────────────────────────────
 
     const socket = io();
 
@@ -171,17 +294,22 @@
       socket.emit('joinRoom', { gameCode: GAME_CODE, playerName: PLAYER_NAME });
     });
 
-    socket.on('gameState', (state) => {
+    socket.on('gameState', state => {
       gameState = state;
+      rebuildFoundCells();
       renderAll();
     });
 
     socket.on('playerJoined', ({ players }) => {
-      if (gameState) { gameState.players = players; renderPlayers(); renderLobby(); }
+      if (!gameState) return;
+      gameState.players = players;
+      renderPlayers();
+      renderLobby();
     });
 
-    socket.on('gameStarted', (state) => {
+    socket.on('gameStarted', state => {
       gameState = state;
+      rebuildFoundCells();
       document.getElementById('lobbyOverlay').style.display = 'none';
       updateStatusPill('playing');
       attachGridListeners();
@@ -189,17 +317,25 @@
     });
 
     socket.on('wordClaimed', ({ word, playerName, positions, players, gameOver, winner, finalScores }) => {
+      if (!gameState) return;
       gameState.players = players;
-      const wordEntry = gameState.words.find(w => w.word === word);
-      if (wordEntry) { wordEntry.foundBy = playerName; wordEntry.positions = positions; }
+
+      // Update local word entry
+      const entry = gameState.words.find(w => w.word === word);
+      if (entry) {
+        entry.foundBy   = playerName;
+        entry.positions = positions;
+      }
+
       // Mark cells
       positions.forEach(pos => {
-        const key = pos.row + '-' + pos.col;
-        foundCells[key] = (playerName === PLAYER_NAME) ? 'mine' : 'other';
+        foundCells[pos.row + '-' + pos.col] = (playerName === PLAYER_NAME) ? 'mine' : 'other';
       });
+
       renderPlayers();
       renderWords();
       renderGrid();
+
       if (gameOver) showGameOver(winner, finalScores);
     });
 
@@ -208,20 +344,21 @@
       window.location.href = '/games/word-search-battle/game/' + newGameCode;
     });
 
-    function renderAll() {
-      // Rebuild foundCells from saved word state (for reconnects / late joiners)
-      foundCells = {};
-      if (gameState.words) {
-        gameState.words.forEach(w => {
-          if (w.foundBy && w.positions) {
-            w.positions.forEach(pos => {
-              const key = pos.row + '-' + pos.col;
-              foundCells[key] = (w.foundBy === PLAYER_NAME) ? 'mine' : 'other';
-            });
-          }
-        });
-      }
+    // ── helpers ───────────────────────────────────────────────────────────────
 
+    function rebuildFoundCells() {
+      foundCells = {};
+      if (!gameState || !gameState.words) return;
+      gameState.words.forEach(w => {
+        if (w.foundBy && w.positions) {
+          w.positions.forEach(pos => {
+            foundCells[pos.row + '-' + pos.col] = (w.foundBy === PLAYER_NAME) ? 'mine' : 'other';
+          });
+        }
+      });
+    }
+
+    function renderAll() {
       renderGrid();
       renderWords();
       renderPlayers();
@@ -234,24 +371,25 @@
         attachGridListeners();
       } else if (gameState.status === 'finished') {
         document.getElementById('lobbyOverlay').style.display = 'none';
-        const scores = gameState.players.map(p => ({ name: p.name, score: p.score }));
-        showGameOver(gameState.winner, scores);
+        updateStatusPill('finished');
+        showGameOver(gameState.winner, gameState.players.map(p => ({ name: p.name, score: p.score })));
       }
     }
 
-    // Attach grid interaction listeners exactly once
+    // Attach grid listeners exactly once
     function attachGridListeners() {
       if (gridListenersAttached) return;
       gridListenersAttached = true;
       const el = document.getElementById('wordGrid');
-      el.addEventListener('mousedown', onMouseDown);
-      el.addEventListener('mouseover', onMouseOver);
-      el.addEventListener('mouseup', onMouseUp);
-      document.addEventListener('mouseup', onMouseUp); // catch release outside grid
+      el.addEventListener('mousedown',  onMouseDown);
+      el.addEventListener('mouseover',  onMouseOver);
+      document.addEventListener('mouseup', onMouseUp);
       el.addEventListener('touchstart', onTouchStart, { passive: false });
-      el.addEventListener('touchmove', onTouchMove, { passive: false });
-      el.addEventListener('touchend', onTouchEnd);
+      el.addEventListener('touchmove',  onTouchMove,  { passive: false });
+      el.addEventListener('touchend',   onTouchEnd);
     }
+
+    // ── render grid ───────────────────────────────────────────────────────────
 
     function renderGrid() {
       if (!gameState || !gameState.grid) return;
@@ -259,7 +397,6 @@
       const size = grid.length;
       const el = document.getElementById('wordGrid');
       el.style.gridTemplateColumns = 'repeat(' + size + ', 1fr)';
-
       el.innerHTML = '';
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
@@ -269,111 +406,41 @@
           cell.dataset.r = r;
           cell.dataset.c = c;
           const key = r + '-' + c;
-          if (foundCells[key] === 'mine') cell.classList.add('found-mine');
+          if      (foundCells[key] === 'mine')  cell.classList.add('found-mine');
           else if (foundCells[key] === 'other') cell.classList.add('found-other');
-          if (currentSelection.some(s => s.r == r && s.c == c)) cell.classList.add('selecting');
+          if (currentSelection.some(s => s.r === r && s.c === c)) cell.classList.add('selecting');
           el.appendChild(cell);
         }
       }
     }
 
-    function getCell(e) {
-      let target = e.target;
-      if (e.touches) {
-        const t = e.touches[0];
-        target = document.elementFromPoint(t.clientX, t.clientY);
-      }
-      if (!target || !target.dataset.r) return null;
-      return { r: parseInt(target.dataset.r), c: parseInt(target.dataset.c) };
-    }
-
-    function onMouseDown(e) {
-      e.preventDefault();
-      const cell = getCell(e);
-      if (!cell) return;
-      selecting = true;
-      startCell = cell;
-      currentSelection = [cell];
-      renderGrid();
-    }
-
-    function onMouseOver(e) {
-      if (!selecting || !startCell) return;
-      const cell = getCell(e);
-      if (!cell) return;
-      currentSelection = getLine(startCell, cell);
-      renderGrid();
-    }
-
-    function onMouseUp(e) {
-      if (!selecting) return;
-      selecting = false;
-      submitSelection();
-    }
-
-    function onTouchStart(e) {
-      e.preventDefault();
-      const cell = getCell(e);
-      if (!cell) return;
-      selecting = true;
-      startCell = cell;
-      currentSelection = [cell];
-      renderGrid();
-    }
-
-    function onTouchMove(e) {
-      e.preventDefault();
-      if (!selecting) return;
-      const cell = getCell(e);
-      if (!cell) return;
-      currentSelection = getLine(startCell, cell);
-      renderGrid();
-    }
-
-    function onTouchEnd(e) {
-      if (!selecting) return;
-      selecting = false;
-      submitSelection();
-    }
-
-    function getLine(a, b) {
-      const dr = b.r - a.r, dc = b.c - a.c;
-      const len = Math.max(Math.abs(dr), Math.abs(dc));
-      if (len === 0) return [a];
-      const isDiag = Math.abs(dr) === Math.abs(dc);
-      const isHoriz = dr === 0;
-      const isVert = dc === 0;
-      if (!isDiag && !isHoriz && !isVert) return [a];
-      const sr = dr === 0 ? 0 : dr / Math.abs(dr);
-      const sc = dc === 0 ? 0 : dc / Math.abs(dc);
-      const cells = [];
-      for (let i = 0; i <= len; i++) cells.push({ r: a.r + sr * i, c: a.c + sc * i });
-      return cells;
-    }
-
-    function submitSelection() {
-      if (!currentSelection.length) return;
-      const word = currentSelection.map(pos => gameState.grid[pos.r][pos.c]).join('');
-      const wordEntry = gameState.words.find(w => (w.word === word || w.word === word.split('').reverse().join('')) && !w.foundBy);
-      if (wordEntry) {
-        const finalWord = wordEntry.word;
-        socket.emit('wordFound', { gameCode: GAME_CODE, playerName: PLAYER_NAME, word: finalWord, positions: currentSelection });
-      }
-      currentSelection = [];
-      renderGrid();
-    }
+    // ── render words list ─────────────────────────────────────────────────────
 
     function renderWords() {
-      if (!gameState) return;
-      const el = document.getElementById('wordsList');
-      el.innerHTML = '<div class="sidebar-title">Words (' + gameState.words.filter(w=>w.foundBy).length + '/' + gameState.words.length + ')</div>';
-      gameState.words.forEach(w => {
-        const item = document.createElement('div');
-        item.className = 'word-item' + (w.foundBy ? (w.foundBy === PLAYER_NAME ? ' found-by-me' : ' found') : '');
-        item.innerHTML = '<span>' + w.word + '</span>' + (w.foundBy ? '<span class="found-by">' + w.foundBy + '</span>' : '');
-        el.appendChild(item);
+      if (!gameState || !gameState.words) return;
+      const words  = gameState.words;
+      const found  = words.filter(w => w.foundBy).length;
+      const total  = words.length;
+
+      document.getElementById('wordsHeader').textContent =
+        'Words — ' + found + ' / ' + total;
+
+      const body = document.getElementById('wordsBody');
+      body.innerHTML = '';
+
+      words.forEach(w => {
+        const div = document.createElement('div');
+        let cls = 'word-item';
+        if (w.foundBy) cls += (w.foundBy === PLAYER_NAME) ? ' found-mine' : ' found-other';
+        div.className = cls;
+        div.innerHTML =
+          '<span>' + w.word + '</span>' +
+          (w.foundBy ? '<span class="found-by">' + w.foundBy + '</span>' : '');
+        body.appendChild(div);
       });
     }
+
+    // ── render players ────────────────────────────────────────────────────────
 
     function renderPlayers() {
       if (!gameState) return;
@@ -382,44 +449,60 @@
       el.innerHTML = sorted.map(p => {
         const me = p.name === PLAYER_NAME;
         if (me && p.isHost) isHost = true;
-        return '<div class="player-item"><div class="player-name">' + (p.isHost ? '<span class="crown">★</span>' : '') + p.name + (me ? '<span class="me">YOU</span>' : '') + '</div><div class="player-score">' + p.score + '</div></div>';
+        return '<div class="player-item">' +
+          '<div class="player-name">' +
+            (p.isHost ? '<span class="crown">★</span>' : '') +
+            p.name +
+            (me ? '<span class="me">YOU</span>' : '') +
+          '</div>' +
+          '<div class="player-score">' + p.score + '</div>' +
+        '</div>';
       }).join('');
     }
+
+    // ── render lobby ──────────────────────────────────────────────────────────
 
     function renderLobby() {
       if (!gameState || gameState.status !== 'waiting') return;
       const el = document.getElementById('lobbyPlayers');
-      el.innerHTML = gameState.players.map(p => '<div class="lobby-player"><span>' + p.name + (p.name === PLAYER_NAME ? ' (you)' : '') + '</span>' + (p.isHost ? '<span class="host-tag">HOST</span>' : '') + '</div>').join('');
+      el.innerHTML = gameState.players.map(p =>
+        '<div class="lobby-player">' +
+          '<span>' + p.name + (p.name === PLAYER_NAME ? ' (you)' : '') + '</span>' +
+          (p.isHost ? '<span class="host-tag">HOST</span>' : '') +
+        '</div>'
+      ).join('');
 
-      const myPlayer = gameState.players.find(p => p.name === PLAYER_NAME);
-      if (myPlayer && myPlayer.isHost) {
-        document.getElementById('startBtn').style.display = 'block';
-        document.getElementById('waitingMsg').style.display = 'none';
+      const me = gameState.players.find(p => p.name === PLAYER_NAME);
+      if (me && me.isHost) {
         isHost = true;
+        document.getElementById('startBtn').style.display  = 'block';
+        document.getElementById('waitingHint').style.display = 'none';
       }
     }
 
-    function startGame() {
-      socket.emit('startGame', { gameCode: GAME_CODE, playerName: PLAYER_NAME });
-    }
-
-    function playAgain() {
-      socket.emit('playAgain', { gameCode: GAME_CODE, playerName: PLAYER_NAME });
-    }
+    // ── game over ─────────────────────────────────────────────────────────────
 
     function showGameOver(winner, scores) {
-      document.getElementById('gameOverOverlay').style.display = 'flex';
       updateStatusPill('finished');
+      document.getElementById('gameOverOverlay').style.display = 'flex';
       const sorted = [...scores].sort((a, b) => b.score - a.score);
-      document.getElementById('winnerAnnounce').textContent = winner === PLAYER_NAME ? '🏆 YOU WIN!' : winner + ' wins this round!';
+      document.getElementById('winnerAnnounce').textContent =
+        winner === PLAYER_NAME ? '🏆 You win this round!' : winner + ' wins this round!';
       document.getElementById('finalScores').innerHTML = sorted.map((p, i) => {
-        const isWinner = p.name === winner;
-        return '<div class="score-item' + (isWinner ? ' winner' : '') + '"><span class="rank">#' + (i+1) + '</span><span class="sname">' + p.name + (isWinner ? ' <span class="winner-badge">WINNER</span>' : '') + '</span><span class="sscore">' + p.score + '</span></div>';
+        const win = p.name === winner;
+        return '<div class="score-item' + (win ? ' winner' : '') + '">' +
+          '<span class="rank">#' + (i + 1) + '</span>' +
+          '<span class="sname">' + p.name + (win ? ' <span class="winner-badge">WINNER</span>' : '') + '</span>' +
+          '<span class="sscore">' + p.score + '</span>' +
+        '</div>';
       }).join('');
-      if (isHost) {
-        document.getElementById('playAgainBtn').style.display = 'block';
-      }
+      if (isHost) document.getElementById('playAgainBtn').style.display = 'block';
     }
+
+    // ── actions ───────────────────────────────────────────────────────────────
+
+    function startGame()  { socket.emit('startGame',  { gameCode: GAME_CODE, playerName: PLAYER_NAME }); }
+    function playAgain()  { socket.emit('playAgain',  { gameCode: GAME_CODE, playerName: PLAYER_NAME }); }
 
     function updateStatusPill(status) {
       const pill = document.getElementById('statusPill');
@@ -432,6 +515,78 @@
       const t = document.getElementById('copiedToast');
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // ── grid interaction ──────────────────────────────────────────────────────
+
+    function getCell(e) {
+      let target = e.target;
+      if (e.touches) target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+      if (!target || !target.dataset || target.dataset.r === undefined) return null;
+      return { r: parseInt(target.dataset.r), c: parseInt(target.dataset.c) };
+    }
+
+    function onMouseDown(e) {
+      e.preventDefault();
+      const cell = getCell(e);
+      if (!cell) return;
+      selecting = true; startCell = cell; currentSelection = [cell];
+      renderGrid();
+    }
+    function onMouseOver(e) {
+      if (!selecting || !startCell) return;
+      const cell = getCell(e);
+      if (cell) { currentSelection = getLine(startCell, cell); renderGrid(); }
+    }
+    function onMouseUp() {
+      if (!selecting) return;
+      selecting = false; submitSelection();
+    }
+    function onTouchStart(e) {
+      e.preventDefault();
+      const cell = getCell(e);
+      if (!cell) return;
+      selecting = true; startCell = cell; currentSelection = [cell];
+      renderGrid();
+    }
+    function onTouchMove(e) {
+      e.preventDefault();
+      if (!selecting) return;
+      const cell = getCell(e);
+      if (cell) { currentSelection = getLine(startCell, cell); renderGrid(); }
+    }
+    function onTouchEnd() {
+      if (!selecting) return;
+      selecting = false; submitSelection();
+    }
+
+    function getLine(a, b) {
+      const dr = b.r - a.r, dc = b.c - a.c;
+      const len = Math.max(Math.abs(dr), Math.abs(dc));
+      if (len === 0) return [a];
+      if (Math.abs(dr) !== Math.abs(dc) && dr !== 0 && dc !== 0) return [a];
+      const sr = dr === 0 ? 0 : dr / Math.abs(dr);
+      const sc = dc === 0 ? 0 : dc / Math.abs(dc);
+      const cells = [];
+      for (let i = 0; i <= len; i++) cells.push({ r: a.r + sr * i, c: a.c + sc * i });
+      return cells;
+    }
+
+    function submitSelection() {
+      if (!currentSelection.length || !gameState) return;
+      const word = currentSelection.map(p => gameState.grid[p.r][p.c]).join('');
+      const rev  = word.split('').reverse().join('');
+      const entry = gameState.words.find(w => (w.word === word || w.word === rev) && !w.foundBy);
+      if (entry) {
+        socket.emit('wordFound', {
+          gameCode:   GAME_CODE,
+          playerName: PLAYER_NAME,
+          word:       entry.word,
+          positions:  currentSelection
+        });
+      }
+      currentSelection = [];
+      renderGrid();
     }
   </script>
 </body>
