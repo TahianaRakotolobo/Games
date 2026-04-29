@@ -16,7 +16,7 @@ const RoundSchema = new mongoose.Schema({
   guessedBy:    [{ playerName: String, guessedAt: Date, pointsAwarded: Number }],
   startedAt:    Date,
   endedAt:      Date,
-  timeLimit:    { type: Number, default: 80 }
+  timeLimit:    { type: Number, default: 40 }
 });
 
 const PicturizeGameSchema = new mongoose.Schema({

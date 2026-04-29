@@ -24,8 +24,7 @@
     .code-badge strong { color:var(--accent); letter-spacing:3px; cursor:pointer; }
     .code-badge strong:hover { text-decoration:underline; }
     .round-info { font-size:0.6rem; color:var(--muted); letter-spacing:1px; }
-    .timer-pill { margin-left:auto; background:var(--accent); color:#fff; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; padding:0.15rem 0.7rem; border-radius:999px; min-width:42px; text-align:center; display:none; }
-    .timer-pill.urgent { background:var(--accent2); animation:pulse 0.5s infinite alternate; }
+    .header-spacer { margin-left:auto; }
     @keyframes pulse { from{opacity:1} to{opacity:0.55} }
 
     /* LAYOUT */
@@ -49,6 +48,32 @@
     .word-hint { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:5px; color:var(--text); word-break:break-all; }
     .category-tag { font-size:0.58rem; color:var(--muted); background:var(--bg); border:1px solid var(--border); padding:0.18rem 0.55rem; border-radius:999px; white-space:nowrap; }
     .canvas-wrap { flex:1; position:relative; overflow:hidden; background:#fff; }
+
+    /* ── TIMER BAR ── */
+    .timer-bar-wrap {
+      flex-shrink:0; display:none; flex-direction:column;
+      align-items:center; padding:0.5rem 1rem 0.4rem;
+      background:var(--surface); border-bottom:1px solid var(--border); gap:0.3rem;
+    }
+    .timer-bar-wrap.visible { display:flex; }
+    .timer-top { display:flex; align-items:center; justify-content:center; gap:0.7rem; width:100%; }
+    .timer-number {
+      font-family:'Bebas Neue',sans-serif; font-size:2.2rem; line-height:1;
+      color:var(--accent); min-width:52px; text-align:center;
+      transition:color 0.3s;
+    }
+    .timer-number.urgent { color:var(--accent2); animation:pulse 0.5s infinite alternate; }
+    .timer-label { font-size:0.55rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
+    .timer-track {
+      width:100%; height:7px; background:var(--border);
+      border-radius:999px; overflow:hidden;
+    }
+    .timer-fill {
+      height:100%; background:var(--accent);
+      border-radius:999px;
+      transition:width 1s linear, background 0.3s;
+    }
+    .timer-fill.urgent { background:var(--accent2); }
     #drawCanvas { position:absolute; inset:0; width:100%; height:100%; touch-action:none; cursor:crosshair; display:block; }
 
     /* TOOLBAR */
@@ -132,7 +157,7 @@
     <a href="/" class="logo">GAME<span>HUB</span></a>
     <div class="code-badge">CODE: <strong onclick="copyCode()"><%= gameCode %></strong></div>
     <div class="round-info" id="roundInfo">En attente…</div>
-    <div class="timer-pill" id="timerPill">80</div>
+    <div class="header-spacer"></div>
   </header>
 
   <div class="layout">
@@ -145,6 +170,18 @@
       <div class="word-bar">
         <div class="word-hint" id="wordHint">—</div>
         <div class="category-tag" id="categoryTag">en attente</div>
+      </div>
+
+      <!-- BIG TIMER BAR — visible for everyone during drawing -->
+      <div class="timer-bar-wrap" id="timerBarWrap">
+        <div class="timer-top">
+          <div class="timer-label">Temps restant</div>
+          <div class="timer-number" id="timerNumber">80</div>
+          <div class="timer-label">secondes</div>
+        </div>
+        <div class="timer-track">
+          <div class="timer-fill" id="timerFill" style="width:100%"></div>
+        </div>
       </div>
       <div class="canvas-wrap"><canvas id="drawCanvas"></canvas></div>
       <div class="toolbar" id="toolbar">
@@ -238,7 +275,7 @@
     if (!PLAYER_NAME) window.location.href = '/games/picturize';
 
     let isHost=false, isDrawer=false, currentWord='';
-    let timerInterval=null, chooseInterval=null, timeLeft=80;
+    let timerInterval=null, chooseInterval=null, timeLeft=40;
     let players=[];
 
     // ── Socket ────────────────────────────────────────────────────────────────
@@ -396,8 +433,37 @@
     document.querySelectorAll('.size-btn').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('.size-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); drawSize=parseInt(b.dataset.size); }));
 
     // ── Timer ──────────────────────────────────────────────────────────────────
-    function startTimer(s){ timeLeft=s; const p=document.getElementById('timerPill'); p.style.display='block'; p.textContent=timeLeft; p.classList.remove('urgent'); clearInterval(timerInterval); timerInterval=setInterval(()=>{ timeLeft--; p.textContent=timeLeft; if(timeLeft<=15)p.classList.add('urgent'); if(timeLeft<=0)stopTimer(); },1000); }
-    function stopTimer(){ clearInterval(timerInterval); document.getElementById('timerPill').style.display='none'; }
+    let totalTime = 40;
+
+    function startTimer(s) {
+      timeLeft = s; totalTime = s;
+      const wrap   = document.getElementById('timerBarWrap');
+      const number = document.getElementById('timerNumber');
+      const fill   = document.getElementById('timerFill');
+      wrap.classList.add('visible');
+      number.textContent = timeLeft;
+      number.classList.remove('urgent');
+      fill.style.width = '100%';
+      fill.classList.remove('urgent');
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        number.textContent = timeLeft;
+        fill.style.width = Math.max(0, (timeLeft / totalTime) * 100) + '%';
+        if (timeLeft <= 15) {
+          number.classList.add('urgent');
+          fill.classList.add('urgent');
+        }
+        if (timeLeft <= 0) stopTimer();
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      document.getElementById('timerBarWrap').classList.remove('visible');
+      document.getElementById('timerNumber').classList.remove('urgent');
+      document.getElementById('timerFill').classList.remove('urgent');
+    }
 
     // ── Chat ───────────────────────────────────────────────────────────────────
     function addChat(msg,type){ const b=document.getElementById('chatMessages'); const d=document.createElement('div'); d.className='chat-msg '+(type||'wrong'); d.textContent=msg; b.appendChild(d); b.scrollTop=b.scrollHeight; }

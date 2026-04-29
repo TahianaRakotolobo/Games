@@ -164,7 +164,7 @@ pNamespace.on('connection', (socket) => {
     if (drawerSock) drawerSock.emit('drawerWord', { word: round.word });
 
     clearTimeout(roundTimers[gameCode]);
-    roundTimers[gameCode] = setTimeout(() => endRound(gameCode, false), round.timeLimit * 1000);
+    roundTimers[gameCode] = setTimeout(() => endRound(gameCode, false), 40 * 1000);
   });
 
   // ── canvas drawing ─────────────────────────
@@ -270,7 +270,7 @@ async function startNextRound(game) {
 
   game.rounds.push({
     roundNumber: game.currentRound, drawerName: drawer.name,
-    word: '', category: '', timeLimit: 80, startedAt: new Date()
+    word: '', category: '', timeLimit: 40, startedAt: new Date()
   });
   await game.save();
 
@@ -305,7 +305,7 @@ async function startNextRound(game) {
       });
       const ds = findSocket(pNamespace, g.gameCode, g, drawer.name);
       if (ds) ds.emit('drawerWord', { word: choices[0].word });
-      roundTimers[g.gameCode] = setTimeout(() => endRound(g.gameCode, false), 80000);
+      roundTimers[g.gameCode] = setTimeout(() => endRound(g.gameCode, false), 40000);
     }
   }, 20000);
 }
