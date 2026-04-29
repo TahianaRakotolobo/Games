@@ -1,7 +1,7 @@
 {
-  "name": "word-search-battle",
+  "name": "gamehub",
   "version": "1.0.0",
-  "description": "Real-time multiplayer word search game",
+  "description": "Multiplayer game hub — Word Search Battle & Picturize",
   "main": "server.js",
   "engines": {
     "node": ">=18.0.0"

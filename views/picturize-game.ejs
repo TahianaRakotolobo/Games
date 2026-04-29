@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Picturize — <%= gameCode %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#fafafa; --surface:#e9e9e9; --border:#b9ade6;
+      --accent:#764976; --accent2:#5c5a9f; --text:#1e1030; --muted:#7a6e99;
+      --radius:12px; --radius-sm:8px;
+    }
+    html,body { height:100%; overflow:hidden; }
+    body { background:var(--bg); color:var(--text); font-family:'Space Mono',monospace; display:flex; flex-direction:column; }
+
+    /* HEADER */
+    header { border-bottom:1px solid var(--border); padding:0.55rem 1rem; display:flex; align-items:center; gap:0.8rem; flex-shrink:0; background:var(--bg); }
+    .logo { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:3px; color:var(--accent); text-decoration:none; }
+    .logo span { color:var(--accent2); }
+    .code-badge { font-size:0.58rem; color:var(--muted); }
+    .code-badge strong { color:var(--accent); letter-spacing:3px; cursor:pointer; }
+    .code-badge strong:hover { text-decoration:underline; }
+    .round-info { font-size:0.6rem; color:var(--muted); letter-spacing:1px; }
+    .timer-pill { margin-left:auto; background:var(--accent); color:#fff; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; padding:0.15rem 0.7rem; border-radius:999px; min-width:42px; text-align:center; display:none; }
+    .timer-pill.urgent { background:var(--accent2); animation:pulse 0.5s infinite alternate; }
+    @keyframes pulse { from{opacity:1} to{opacity:0.55} }
+
+    /* LAYOUT */
+    .layout { display:flex; flex:1; overflow:hidden; }
+
+    /* LEFT — players */
+    .sidebar-left { width:140px; flex-shrink:0; border-right:1px solid var(--border); background:var(--surface); display:flex; flex-direction:column; overflow:hidden; }
+    .stitle { font-size:0.52rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); font-weight:700; padding:0.65rem 0.7rem 0.25rem; }
+    .player-list { flex:1; overflow-y:auto; padding:0.35rem 0.4rem; }
+    .player-row { display:flex; align-items:center; justify-content:space-between; padding:0.35rem 0.45rem; margin-bottom:0.22rem; border:1px solid transparent; border-radius:var(--radius-sm); font-size:0.6rem; gap:0.2rem; }
+    .player-row.drawing { border-color:var(--accent); background:rgba(118,73,118,0.07); }
+    .pname { display:flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; }
+    .pname-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70px; }
+    .crown { color:var(--accent); font-size:0.65rem; }
+    .me-tag { font-size:0.44rem; color:var(--accent2); border:1px solid var(--accent2); padding:0.05rem 0.22rem; border-radius:999px; flex-shrink:0; }
+    .pscore { font-weight:700; color:var(--accent); font-size:0.72rem; flex-shrink:0; }
+
+    /* CENTRE */
+    .centre { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+    .word-bar { padding:0.45rem 0.8rem; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; gap:0.5rem; }
+    .word-hint { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:5px; color:var(--text); word-break:break-all; }
+    .category-tag { font-size:0.58rem; color:var(--muted); background:var(--bg); border:1px solid var(--border); padding:0.18rem 0.55rem; border-radius:999px; white-space:nowrap; }
+    .canvas-wrap { flex:1; position:relative; overflow:hidden; background:#fff; }
+    #drawCanvas { position:absolute; inset:0; width:100%; height:100%; touch-action:none; cursor:crosshair; display:block; }
+
+    /* TOOLBAR */
+    .toolbar { display:none; flex-shrink:0; padding:0.45rem 0.7rem; border-top:1px solid var(--border); background:var(--surface); flex-wrap:wrap; gap:0.45rem; align-items:center; }
+    .toolbar.visible { display:flex; }
+    .color-btn { width:24px; height:24px; border-radius:50%; border:2px solid transparent; cursor:pointer; transition:0.15s; flex-shrink:0; }
+    .color-btn.active, .color-btn:hover { border-color:var(--accent2); transform:scale(1.2); }
+    .size-btn { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); font-family:'Space Mono',monospace; font-size:0.58rem; padding:0.18rem 0.45rem; cursor:pointer; transition:0.15s; }
+    .size-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .tool-btn { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.7rem; padding:0.18rem 0.55rem; cursor:pointer; transition:0.15s; }
+    .tool-btn:hover { border-color:var(--accent); }
+    .sep { width:1px; height:20px; background:var(--border); }
+
+    /* RIGHT — chat */
+    .sidebar-right { width:190px; flex-shrink:0; border-left:1px solid var(--border); background:var(--surface); display:flex; flex-direction:column; overflow:hidden; }
+    .chat-messages { flex:1; overflow-y:auto; padding:0.45rem; display:flex; flex-direction:column; gap:0.25rem; }
+    .chat-msg { font-size:0.62rem; line-height:1.45; padding:0.28rem 0.45rem; border-radius:var(--radius-sm); word-break:break-word; }
+    .chat-msg.system  { color:var(--muted); font-style:italic; }
+    .chat-msg.correct { background:rgba(118,73,118,0.12); color:var(--accent); font-weight:700; }
+    .chat-msg.wrong   { background:var(--bg); color:var(--text); }
+    .chat-msg.translated { background:rgba(92,90,159,0.08); color:var(--accent2); font-style:italic; font-size:0.56rem; }
+    .sender { color:var(--accent2); font-weight:700; }
+    .chat-input-wrap { padding:0.45rem; border-top:1px solid var(--border); display:flex; gap:0.35rem; }
+    .chat-input { flex:1; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:'Space Mono',monospace; font-size:0.68rem; padding:0.38rem 0.55rem; outline:none; min-width:0; }
+    .chat-input:focus { border-color:var(--accent); }
+    .chat-send { background:var(--accent); color:#fff; border:none; border-radius:var(--radius-sm); padding:0.38rem 0.55rem; cursor:pointer; font-size:0.78rem; flex-shrink:0; }
+    .chat-send:hover { background:var(--accent2); }
+    .fr-hint { font-size:0.5rem; color:var(--muted); text-align:center; padding:0.2rem 0.45rem 0; letter-spacing:0.5px; }
+
+    /* OVERLAYS */
+    .overlay { position:fixed; inset:0; background:rgba(30,16,48,0.5); backdrop-filter:blur(6px); z-index:50; display:flex; align-items:center; justify-content:center; padding:1rem; }
+    .overlay-box { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; width:480px; max-width:100%; text-align:center; box-shadow:0 12px 48px rgba(118,73,118,0.18); }
+    .overlay-box h2 { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:3px; margin-bottom:0.25rem; }
+    .overlay-box .sub { font-size:0.65rem; color:var(--muted); margin-bottom:1rem; }
+    .lobby-code { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:8px; color:var(--accent); cursor:pointer; margin:0.6rem 0; }
+    .lobby-code:hover { opacity:0.8; }
+    .lobby-hint { font-size:0.58rem; color:var(--muted); margin-bottom:1rem; }
+    .player-chips { display:flex; flex-wrap:wrap; gap:0.35rem; justify-content:center; margin-bottom:1rem; }
+    .chip { background:var(--surface); border:1px solid var(--border); border-radius:999px; font-size:0.62rem; padding:0.22rem 0.65rem; display:flex; align-items:center; gap:0.28rem; }
+    .chip .hdot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+    .btn { font-family:'Space Mono',monospace; font-size:0.7rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:0.75rem 1.6rem; border:none; cursor:pointer; border-radius:var(--radius-sm); transition:0.2s; }
+    .btn-accent { background:var(--accent); color:#fff; }
+    .btn-accent:hover { background:var(--accent2); }
+    .btn-outline { background:transparent; border:1px solid var(--border); color:var(--muted); }
+    .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* word choice cards */
+    .word-choices { display:flex; gap:0.7rem; justify-content:center; flex-wrap:wrap; margin:0.8rem 0; }
+    .word-choice-btn { background:var(--surface); border:2px solid var(--border); border-radius:var(--radius); padding:0.85rem 1.2rem; cursor:pointer; transition:0.2s; text-align:center; min-width:110px; }
+    .word-choice-btn:hover { border-color:var(--accent); background:rgba(118,73,118,0.06); }
+    .wc-word { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:2px; color:var(--text); }
+    .wc-cat  { font-size:0.58rem; color:var(--muted); margin-top:0.15rem; }
+
+    /* scores */
+    .score-list { margin:0.7rem 0; text-align:left; }
+    .score-row { display:flex; align-items:center; justify-content:space-between; padding:0.42rem 0.75rem; margin-bottom:0.28rem; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); }
+    .score-row.wr { border-color:var(--accent); }
+    .score-row .rank  { font-family:'Bebas Neue',sans-serif; font-size:1.05rem; color:var(--muted); margin-right:0.5rem; }
+    .score-row .sname { font-size:0.72rem; }
+    .score-row .sscore { font-family:'Bebas Neue',sans-serif; font-size:1.25rem; color:var(--accent); }
+    .wbadge { font-size:0.5rem; border:1px solid var(--accent); color:var(--accent); padding:0.08rem 0.32rem; border-radius:999px; margin-left:0.35rem; }
+
+    .toast { position:fixed; bottom:1.4rem; right:1.4rem; background:var(--accent); color:#fff; padding:0.5rem 0.9rem; font-size:0.62rem; font-weight:700; letter-spacing:1px; border-radius:var(--radius-sm); opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:300; }
+    .toast.show { opacity:1; }
+
+    /* Mobile */
+    @media (max-width:600px) {
+      .sidebar-left { width:82px; }
+      .sidebar-right { width:120px; }
+      .word-hint { font-size:0.95rem; letter-spacing:3px; }
+      .overlay-box { padding:1.2rem; }
+      .lobby-code { font-size:2.2rem; }
+      .word-choices { flex-direction:column; align-items:center; }
+      .toolbar { gap:0.3rem; }
+      .color-btn { width:20px; height:20px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">GAME<span>HUB</span></a>
+    <div class="code-badge">CODE: <strong onclick="copyCode()"><%= gameCode %></strong></div>
+    <div class="round-info" id="roundInfo">En attente…</div>
+    <div class="timer-pill" id="timerPill">80</div>
+  </header>
+
+  <div class="layout">
+    <div class="sidebar-left">
+      <div class="stitle">Joueurs</div>
+      <div class="player-list" id="playerList"></div>
+    </div>
+
+    <div class="centre">
+      <div class="word-bar">
+        <div class="word-hint" id="wordHint">—</div>
+        <div class="category-tag" id="categoryTag">en attente</div>
+      </div>
+      <div class="canvas-wrap"><canvas id="drawCanvas"></canvas></div>
+      <div class="toolbar" id="toolbar">
+        <button class="color-btn active" style="background:#1e1030" data-color="#1e1030"></button>
+        <button class="color-btn" style="background:#764976" data-color="#764976"></button>
+        <button class="color-btn" style="background:#5c5a9f" data-color="#5c5a9f"></button>
+        <button class="color-btn" style="background:#e05050" data-color="#e05050"></button>
+        <button class="color-btn" style="background:#e08820" data-color="#e08820"></button>
+        <button class="color-btn" style="background:#30a050" data-color="#30a050"></button>
+        <button class="color-btn" style="background:#4090d0" data-color="#4090d0"></button>
+        <button class="color-btn" style="background:#fff;border:1px solid #b9ade6" data-color="#ffffff"></button>
+        <div class="sep"></div>
+        <button class="size-btn active" data-size="4">S</button>
+        <button class="size-btn" data-size="10">M</button>
+        <button class="size-btn" data-size="20">L</button>
+        <div class="sep"></div>
+        <button class="tool-btn" onclick="doClear()">🗑️</button>
+      </div>
+    </div>
+
+    <div class="sidebar-right">
+      <div class="stitle" style="padding:0.65rem 0.7rem 0.25rem;">Chat / Devine</div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="fr-hint">💬 Écris en français ou en anglais</div>
+      <div class="chat-input-wrap">
+        <input class="chat-input" id="guessInput" type="text" placeholder="Devine…" maxlength="60" autocomplete="off"/>
+        <button class="chat-send" onclick="sendGuess()">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOBBY -->
+  <div class="overlay" id="lobbyOverlay">
+    <div class="overlay-box">
+      <h2>LOBBY</h2>
+      <div class="sub">Picturize — Dessine &amp; Devine</div>
+      <div class="lobby-code" onclick="copyCode()"><%= gameCode %></div>
+      <div class="lobby-hint">Partage ce code pour que tes amis rejoignent</div>
+      <div class="player-chips" id="lobbyChips"></div>
+      <button class="btn btn-accent" id="startBtn" onclick="startGame()" style="display:none">Commencer →</button>
+      <div id="waitHint" style="font-size:0.65rem;color:var(--muted);">En attente du créateur…</div>
+    </div>
+  </div>
+
+  <!-- CHOOSING (drawer) -->
+  <div class="overlay" id="choosingOverlay" style="display:none">
+    <div class="overlay-box">
+      <h2>TON TOUR !</h2>
+      <div class="sub">Choisis un mot à dessiner — <span id="chooseCountdown">20</span>s</div>
+      <div class="word-choices" id="wordChoices"></div>
+    </div>
+  </div>
+
+  <!-- WAITING (guessers) -->
+  <div class="overlay" id="waitingOverlay" style="display:none">
+    <div class="overlay-box">
+      <h2>PRÊT ?</h2>
+      <div class="sub" id="waitingMsg">Le dessinateur choisit un mot…</div>
+    </div>
+  </div>
+
+  <!-- ROUND END -->
+  <div class="overlay" id="roundEndOverlay" style="display:none">
+    <div class="overlay-box">
+      <h2>FIN DU TOUR</h2>
+      <div class="sub" id="roundEndWord"></div>
+      <div class="score-list" id="roundScores"></div>
+      <div style="font-size:0.62rem;color:var(--muted);margin-top:0.7rem;" id="nextHint">Prochain tour dans 4 secondes…</div>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="overlay" id="gameOverOverlay" style="display:none">
+    <div class="overlay-box">
+      <h2>FIN DE PARTIE</h2>
+      <div class="sub" id="gameOverWinner"></div>
+      <div class="score-list" id="gameOverScores"></div>
+      <div style="display:flex;gap:0.8rem;justify-content:center;margin-top:1.1rem;flex-wrap:wrap;">
+        <button class="btn btn-accent" id="playAgainBtn" onclick="playAgain()" style="display:none">Rejouer →</button>
+        <a href="/games/picturize" class="btn btn-outline" style="text-decoration:none;">Nouvelle session</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const GAME_CODE   = '<%= gameCode %>';
+    const PLAYER_NAME = sessionStorage.getItem('playerName') || '';
+    if (!PLAYER_NAME) window.location.href = '/games/picturize';
+
+    let isHost=false, isDrawer=false, currentWord='';
+    let timerInterval=null, chooseInterval=null, timeLeft=80;
+    let players=[];
+
+    // ── Socket ────────────────────────────────────────────────────────────────
+    const socket = io('/picturize');
+    socket.on('connect', () => socket.emit('joinRoom', { gameCode:GAME_CODE, playerName:PLAYER_NAME }));
+
+    socket.on('gameState', state => {
+      players = state.players;
+      renderPlayers(players, null);
+      renderLobby(players);
+      const me = players.find(p=>p.name===PLAYER_NAME);
+      if (me?.isHost) { isHost=true; document.getElementById('startBtn').style.display='block'; document.getElementById('waitHint').style.display='none'; }
+      if (state.status!=='waiting') document.getElementById('lobbyOverlay').style.display='none';
+    });
+
+    socket.on('playerJoined', ({ playerName, players:pl }) => {
+      players=pl; renderLobby(players); renderPlayers(players,null);
+      addChat(playerName+' a rejoint la partie','system');
+    });
+
+    socket.on('gameError', ({ message }) => showToast(message));
+
+    socket.on('choosingPhase', ({ drawerName, roundNumber, totalRounds, players:pl }) => {
+      players=pl;
+      document.getElementById('lobbyOverlay').style.display='none';
+      document.getElementById('roundEndOverlay').style.display='none';
+      document.getElementById('roundInfo').textContent='Tour '+roundNumber+' / '+totalRounds;
+      isDrawer = (drawerName===PLAYER_NAME);
+      currentWord='';
+      doClear(true);
+      renderPlayers(players, drawerName);
+      addChat('— Tour '+roundNumber+' : '+drawerName+' dessine —','system');
+      if (!isDrawer) {
+        document.getElementById('choosingOverlay').style.display='none';
+        document.getElementById('waitingOverlay').style.display='flex';
+        document.getElementById('waitingMsg').textContent=drawerName+' choisit un mot…';
+        document.getElementById('wordHint').textContent='???';
+        document.getElementById('categoryTag').textContent='choix…';
+        document.getElementById('guessInput').disabled=true;
+      } else {
+        let cd=20; document.getElementById('chooseCountdown').textContent=cd;
+        clearInterval(chooseInterval);
+        chooseInterval=setInterval(()=>{ cd--; document.getElementById('chooseCountdown').textContent=cd; if(cd<=0)clearInterval(chooseInterval); },1000);
+      }
+    });
+
+    socket.on('wordChoices', ({ choices, forDrawer }) => {
+      if (forDrawer && forDrawer!==PLAYER_NAME) return;
+      if (!isDrawer && !forDrawer) return;
+      document.getElementById('waitingOverlay').style.display='none';
+      document.getElementById('choosingOverlay').style.display='flex';
+      const c=document.getElementById('wordChoices'); c.innerHTML='';
+      choices.forEach(({word,category}) => {
+        const b=document.createElement('button');
+        b.className='word-choice-btn';
+        b.innerHTML='<div class="wc-word">'+word+'</div><div class="wc-cat">'+category+'</div>';
+        b.onclick=()=>{ clearInterval(chooseInterval); document.getElementById('choosingOverlay').style.display='none'; socket.emit('wordChosen',{gameCode:GAME_CODE,playerName:PLAYER_NAME,word,category}); };
+        c.appendChild(b);
+      });
+    });
+
+    socket.on('drawerWord', ({ word }) => {
+      currentWord=word;
+      document.getElementById('wordHint').textContent=word;
+      addChat('✏️ Dessine : '+word,'system');
+    });
+
+    socket.on('roundStarted', ({ drawerName, category, blanks, wordLength, timeLimit }) => {
+      document.getElementById('choosingOverlay').style.display='none';
+      document.getElementById('waitingOverlay').style.display='none';
+      document.getElementById('roundEndOverlay').style.display='none';
+      document.getElementById('categoryTag').textContent='📂 '+category;
+      document.getElementById('toolbar').classList.toggle('visible', isDrawer);
+      document.getElementById('guessInput').disabled=isDrawer;
+      if (!isDrawer) {
+        // show underscores for each letter
+        document.getElementById('wordHint').textContent = Array(wordLength).fill('_').join('  ');
+      }
+      startTimer(timeLimit); doClear(true);
+    });
+
+    socket.on('draw',        data => { if (!isDrawer) remoteDrawSegment(data); });
+    socket.on('clearCanvas', ()   => { if (!isDrawer) doClear(true); });
+
+    socket.on('correctGuess', ({ playerName, points, translatedTo, players:pl }) => {
+      players=pl; renderPlayers(players,null);
+      const msg = translatedTo
+        ? '✓ '+playerName+' a deviné ! +'+points+' («'+translatedTo+'»)'
+        : '✓ '+playerName+' a deviné ! +'+points;
+      addChat(msg,'correct');
+      if (translatedTo && playerName===PLAYER_NAME) showToast('Traduit en: '+translatedTo);
+    });
+
+    socket.on('wrongGuess', ({ playerName, guess, translatedTo }) => {
+      if (playerName!==PLAYER_NAME) {
+        addChat(playerName+': '+guess,'wrong');
+        if (translatedTo) addChat('  → traduit: '+translatedTo,'translated');
+      }
+    });
+
+    socket.on('roundEnded', ({ word, allGuessed, players:pl, roundNumber, totalRounds }) => {
+      players=pl; stopTimer();
+      document.getElementById('toolbar').classList.remove('visible');
+      document.getElementById('guessInput').disabled=true;
+      document.getElementById('roundEndOverlay').style.display='flex';
+      document.getElementById('roundEndWord').textContent='Le mot était : '+word;
+      document.getElementById('nextHint').textContent=roundNumber>=totalRounds?'Dernier tour — calcul des résultats…':'Prochain tour dans 4 secondes…';
+      renderScoreList('roundScores',pl); renderPlayers(pl,null);
+      isDrawer=false; currentWord='';
+    });
+
+    socket.on('gameOver', ({ winner, players:pl }) => {
+      document.getElementById('roundEndOverlay').style.display='none';
+      document.getElementById('gameOverOverlay').style.display='flex';
+      document.getElementById('gameOverWinner').textContent=winner===PLAYER_NAME?'🏆 Tu as gagné !':winner+' remporte la partie !';
+      renderScoreList('gameOverScores',pl);
+      if (isHost) document.getElementById('playAgainBtn').style.display='block';
+    });
+
+    socket.on('newGameReady', ({ newGameCode }) => {
+      sessionStorage.setItem('gameCode',newGameCode);
+      window.location.href='/games/picturize/game/'+newGameCode;
+    });
+
+    // ── Canvas ────────────────────────────────────────────────────────────────
+    const canvas=document.getElementById('drawCanvas');
+    const ctx=canvas.getContext('2d');
+    let drawing=false, lastX=0, lastY=0, drawColor='#1e1030', drawSize=4;
+
+    function resizeCanvas() {
+      const wrap=canvas.parentElement;
+      const img=ctx.getImageData(0,0,canvas.width,canvas.height);
+      canvas.width=wrap.clientWidth; canvas.height=wrap.clientHeight;
+      ctx.putImageData(img,0,0); ctx.lineCap='round'; ctx.lineJoin='round';
+    }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+    function getPos(e) {
+      const rect=canvas.getBoundingClientRect();
+      const src=e.touches?e.touches[0]:e;
+      return { x:(src.clientX-rect.left)*(canvas.width/rect.width), y:(src.clientY-rect.top)*(canvas.height/rect.height) };
+    }
+    function startDraw(e){ if(!isDrawer)return; e.preventDefault(); drawing=true; const{x,y}=getPos(e); lastX=x;lastY=y; ctx.beginPath();ctx.arc(x,y,drawSize/2,0,Math.PI*2);ctx.fillStyle=drawColor;ctx.fill(); socket.emit('draw',{gameCode:GAME_CODE,data:{type:'dot',x,y,color:drawColor,size:drawSize}}); }
+    function moveDraw(e){ if(!isDrawer||!drawing)return; e.preventDefault(); const{x,y}=getPos(e); ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(x,y);ctx.strokeStyle=drawColor;ctx.lineWidth=drawSize;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke(); socket.emit('draw',{gameCode:GAME_CODE,data:{type:'line',x0:lastX,y0:lastY,x1:x,y1:y,color:drawColor,size:drawSize}}); lastX=x;lastY=y; }
+    function stopDraw(){ drawing=false; }
+
+    canvas.addEventListener('mousedown',startDraw); canvas.addEventListener('mousemove',moveDraw);
+    canvas.addEventListener('mouseup',stopDraw); canvas.addEventListener('mouseleave',stopDraw);
+    canvas.addEventListener('touchstart',startDraw,{passive:false}); canvas.addEventListener('touchmove',moveDraw,{passive:false}); canvas.addEventListener('touchend',stopDraw);
+
+    function remoteDrawSegment(d){ ctx.strokeStyle=d.color;ctx.fillStyle=d.color;ctx.lineWidth=d.size;ctx.lineCap='round';ctx.lineJoin='round'; if(d.type==='dot'){ctx.beginPath();ctx.arc(d.x,d.y,d.size/2,0,Math.PI*2);ctx.fill();}else{ctx.beginPath();ctx.moveTo(d.x0,d.y0);ctx.lineTo(d.x1,d.y1);ctx.stroke();} }
+    function doClear(silent){ ctx.clearRect(0,0,canvas.width,canvas.height); if(!silent&&isDrawer) socket.emit('clearCanvas',{gameCode:GAME_CODE}); }
+
+    document.querySelectorAll('.color-btn').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('.color-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); drawColor=b.dataset.color; }));
+    document.querySelectorAll('.size-btn').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('.size-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); drawSize=parseInt(b.dataset.size); }));
+
+    // ── Timer ──────────────────────────────────────────────────────────────────
+    function startTimer(s){ timeLeft=s; const p=document.getElementById('timerPill'); p.style.display='block'; p.textContent=timeLeft; p.classList.remove('urgent'); clearInterval(timerInterval); timerInterval=setInterval(()=>{ timeLeft--; p.textContent=timeLeft; if(timeLeft<=15)p.classList.add('urgent'); if(timeLeft<=0)stopTimer(); },1000); }
+    function stopTimer(){ clearInterval(timerInterval); document.getElementById('timerPill').style.display='none'; }
+
+    // ── Chat ───────────────────────────────────────────────────────────────────
+    function addChat(msg,type){ const b=document.getElementById('chatMessages'); const d=document.createElement('div'); d.className='chat-msg '+(type||'wrong'); d.textContent=msg; b.appendChild(d); b.scrollTop=b.scrollHeight; }
+
+    function sendGuess(){ const inp=document.getElementById('guessInput'); const g=inp.value.trim(); if(!g||isDrawer)return; socket.emit('guess',{gameCode:GAME_CODE,playerName:PLAYER_NAME,guess:g}); addChat('Toi: '+g,'wrong'); inp.value=''; }
+    document.getElementById('guessInput').addEventListener('keydown',e=>{ if(e.key==='Enter')sendGuess(); });
+
+    // ── Render ─────────────────────────────────────────────────────────────────
+    function renderPlayers(pl,drawerName){ const l=document.getElementById('playerList'); l.innerHTML=[...pl].sort((a,b)=>b.score-a.score).map(p=>{ const me=p.name===PLAYER_NAME; if(me&&p.isHost)isHost=true; const dr=p.name===drawerName; return '<div class="player-row'+(dr?' drawing':'')+'"><div class="pname">'+(dr?'✏️ ':'')+( p.isHost?'<span class="crown">★</span>':'')+' <span class="pname-text">'+p.name.substring(0,12)+'</span>'+(me?'<span class="me-tag">TOI</span>':'')+'</div><div class="pscore">'+p.score+'</div></div>'; }).join(''); }
+
+    function renderLobby(pl){ document.getElementById('lobbyChips').innerHTML=pl.map(p=>'<div class="chip">'+(p.isHost?'<span class="hdot"></span>':'')+p.name+(p.name===PLAYER_NAME?' (toi)':'')+'</div>').join(''); }
+
+    function renderScoreList(id,pl){ const s=[...pl].sort((a,b)=>b.score-a.score); document.getElementById(id).innerHTML=s.map((p,i)=>'<div class="score-row'+(i===0?' wr':'')+'"><span class="rank">#'+(i+1)+'</span><span class="sname">'+p.name+(i===0?'<span class="wbadge">WINNER</span>':'')+'</span><span class="sscore">'+p.score+'</span></div>').join(''); }
+
+    function startGame(){ socket.emit('startGame',{gameCode:GAME_CODE,playerName:PLAYER_NAME}); }
+    function playAgain(){ socket.emit('playAgain',{gameCode:GAME_CODE,playerName:PLAYER_NAME}); }
+    function copyCode(){ navigator.clipboard.writeText(GAME_CODE); showToast('Code copié !'); }
+    function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+  </script>
+</body>
+</html>

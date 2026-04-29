@@ -3,65 +3,49 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Game Arcade</title>
+  <title>GameHub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #fafafa; --surface: #e9e9e9; --border: #b9ade6;
-      --accent: #764976; --accent2: #5c5a9f; --text: #1e1030; --muted: #7a6e99;
-      --radius: 16px; --radius-sm: 10px;
-    }
-    body { background:var(--bg); color:var(--text); font-family:'Space Mono',monospace; min-height:100vh; }
-    body::before {
-      content:''; position:fixed; inset:0;
-      background-image: linear-gradient(rgba(118,73,118,0.06) 1px,transparent 1px), linear-gradient(90deg,rgba(118,73,118,0.06) 1px,transparent 1px);
-      background-size:40px 40px; pointer-events:none;
-    }
-    header {
-      border-bottom:1px solid var(--border); padding:1.5rem 3rem;
-      display:flex; align-items:center; justify-content:space-between; background:var(--bg);
-    }
-    .logo { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:4px; color:var(--accent); }
-    .logo span { color:var(--accent2); }
-    .tagline { font-size:0.68rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
-
-    main { max-width:1100px; margin:0 auto; padding:4rem 2rem; }
-    .section-header { margin-bottom:3rem; }
-    .section-header h2 { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:3px; line-height:1; }
-    .section-header p  { color:var(--muted); font-size:0.72rem; margin-top:0.5rem; letter-spacing:1px; }
-
-    .games-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:1.5rem; }
-
-    .game-card {
-      background:var(--surface); border:1px solid var(--border);
-      border-radius:var(--radius);
-      position:relative; overflow:hidden; cursor:pointer;
-      text-decoration:none; color:inherit; display:block;
-      transition:border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-    }
-    .game-card:hover { border-color:var(--accent); transform:translateY(-4px); box-shadow:0 12px 36px rgba(118,73,118,0.15); }
-    .game-card:hover .card-glow { opacity:1; }
-    .card-glow { position:absolute; inset:-1px; background:linear-gradient(135deg,rgba(118,73,118,0.12),transparent 60%); opacity:0; transition:opacity 0.3s; pointer-events:none; border-radius:var(--radius); }
-
-    .card-art { height:180px; background:#d8cef0; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
-    .word-grid-art { display:grid; grid-template-columns:repeat(8,1fr); gap:4px; opacity:0.5; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; color:var(--accent); }
-    .word-grid-art span { text-align:center; }
-    .word-grid-art span.hl { color:var(--accent2); opacity:1; }
-    .badge { position:absolute; top:1rem; right:1rem; background:var(--accent2); color:#fff; font-size:0.58rem; font-weight:700; letter-spacing:2px; padding:0.2rem 0.7rem; border-radius:999px; text-transform:uppercase; }
-
-    .card-body { padding:1.5rem; }
-    .card-body h3 { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:2px; margin-bottom:0.5rem; }
-    .card-body p  { font-size:0.72rem; color:var(--muted); line-height:1.7; }
-
-    .card-footer { padding:1rem 1.5rem; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-    .tag { font-size:0.62rem; letter-spacing:1px; color:var(--muted); text-transform:uppercase; background:var(--bg); padding:0.2rem 0.6rem; border:1px solid var(--border); border-radius:999px; }
-    .play-btn { font-family:'Space Mono',monospace; font-size:0.68rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; background:var(--accent); color:#fff; padding:0.4rem 1.1rem; border:none; cursor:pointer; border-radius:var(--radius-sm); transition:0.2s; }
-    .play-btn:hover { background:var(--accent2); }
-
-    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-    .game-card { animation:fadeUp 0.5s ease both; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafafa;--surface:#e9e9e9;--border:#b9ade6;--accent:#764976;--accent2:#5c5a9f;--text:#1e1030;--muted:#7a6e99;--radius:16px;--radius-sm:10px}
+    body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(118,73,118,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(118,73,118,0.06) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+    header{border-bottom:1px solid var(--border);padding:1.5rem 3rem;display:flex;align-items:center;justify-content:space-between;background:var(--bg)}
+    .logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:4px;color:var(--accent)}
+    .logo span{color:var(--accent2)}
+    .tagline{font-size:0.68rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+    main{max-width:1100px;margin:0 auto;padding:4rem 2rem}
+    .section-header{margin-bottom:3rem}
+    .section-header h2{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:3px;line-height:1}
+    .section-header p{color:var(--muted);font-size:0.72rem;margin-top:0.5rem;letter-spacing:1px}
+    .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem}
+    .game-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;color:inherit;display:block;transition:border-color .2s,transform .2s,box-shadow .2s}
+    .game-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 12px 36px rgba(118,73,118,.15)}
+    .game-card:hover .card-glow{opacity:1}
+    .card-glow{position:absolute;inset:-1px;background:linear-gradient(135deg,rgba(118,73,118,.12),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none;border-radius:var(--radius)}
+    .card-art{height:180px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+    .card-art-ws{background:#d8cef0}
+    .card-art-pic{background:#cdd8f0}
+    .word-grid-art{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;opacity:.5;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent)}
+    .word-grid-art span{text-align:center}
+    .word-grid-art .hl{color:var(--accent2);opacity:1}
+    .draw-art{font-size:4rem;opacity:.55}
+    .badge{position:absolute;top:1rem;right:1rem;color:#fff;font-size:0.58rem;font-weight:700;letter-spacing:2px;padding:.2rem .7rem;border-radius:999px;text-transform:uppercase}
+    .badge-multi{background:var(--accent2)}
+    .badge-draw{background:var(--accent)}
+    .card-body{padding:1.5rem}
+    .card-body h3{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;margin-bottom:.5rem}
+    .card-body p{font-size:.72rem;color:var(--muted);line-height:1.7}
+    .card-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .tags{display:flex;gap:.5rem}
+    .tag{font-size:.6rem;letter-spacing:1px;color:var(--muted);text-transform:uppercase;background:var(--bg);padding:.2rem .6rem;border:1px solid var(--border);border-radius:999px}
+    .play-btn{font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:var(--accent);color:#fff;padding:.4rem 1.1rem;border:none;cursor:pointer;border-radius:var(--radius-sm);transition:.2s}
+    .play-btn:hover{background:var(--accent2)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .game-card{animation:fadeUp .5s ease both}
+    .game-card:nth-child(2){animation-delay:.1s}
+    @media(max-width:600px){header{padding:1rem 1.2rem}.logo{font-size:1.5rem}main{padding:2rem 1rem}}
   </style>
 </head>
 <body>
@@ -75,10 +59,12 @@
       <p>// choose your battle — more games coming soon</p>
     </div>
     <div class="games-grid">
+
+      <!-- Word Search Battle -->
       <a href="/games/word-search-battle" class="game-card">
         <div class="card-glow"></div>
-        <div class="card-art">
-          <div class="badge">Multiplayer</div>
+        <div class="card-art card-art-ws">
+          <div class="badge badge-multi">Multiplayer</div>
           <div class="word-grid-art">
             <span>W</span><span class="hl">B</span><span>A</span><span>T</span><span>T</span><span class="hl">L</span><span>E</span><span>X</span>
             <span>O</span><span>R</span><span>D</span><span>Q</span><span>Z</span><span>K</span><span>M</span><span>P</span>
@@ -93,13 +79,28 @@
           <p>Real-time multiplayer puzzle. Find hidden words faster than your opponents. Create a game, share the code, and compete live.</p>
         </div>
         <div class="card-footer">
-          <div style="display:flex;gap:0.5rem;">
-            <span class="tag">Real-Time</span>
-            <span class="tag">2–8 Players</span>
-          </div>
+          <div class="tags"><span class="tag">Real-Time</span><span class="tag">2–8 Players</span></div>
           <button class="play-btn">Play Now →</button>
         </div>
       </a>
+
+      <!-- Picturize -->
+      <a href="/games/picturize" class="game-card">
+        <div class="card-glow"></div>
+        <div class="card-art card-art-pic">
+          <div class="badge badge-draw">Draw & Guess</div>
+          <div class="draw-art">🎨✏️🖼️</div>
+        </div>
+        <div class="card-body">
+          <h3>PICTURIZE</h3>
+          <p>Multiplayer drawing and guessing game. Draw your word, let others guess it — in French or English! The fastest guesser scores the most points.</p>
+        </div>
+        <div class="card-footer">
+          <div class="tags"><span class="tag">Real-Time</span><span class="tag">2–8 Players</span><span class="tag">🇫🇷 FR/EN</span></div>
+          <button class="play-btn">Play Now →</button>
+        </div>
+      </a>
+
     </div>
   </main>
 </body>

@@ -264,7 +264,7 @@
 
     if (!PLAYER_NAME) window.location.href = '/games/word-search-battle';
 
-    const socket = io();
+    const socket = io('/wordsearch');
 
     socket.on('connect', () => socket.emit('joinRoom', { gameCode: GAME_CODE, playerName: PLAYER_NAME }));
 
