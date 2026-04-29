@@ -1,9 +1,8 @@
 /**
  * puzzle.js — word fetching + grid generation
  *
- * Words are pulled randomly from the `words` MongoDB collection.
- * If the collection is empty a built-in fallback list is used so
- * the app still works before you seed the database.
+ * Fetches random words from the `words` MongoDB collection.
+ * Falls back to a built-in list ONLY if the collection is genuinely empty.
  */
 
 const Word = require('../models/Word');
@@ -49,24 +48,19 @@ function tryPlace(grid, word, size) {
       return { word, positions, foundBy: null, foundAt: null };
     }
   }
-  return null; // could not place this word
+  return null;
 }
 
 function buildGrid(wordStrings, size = 15) {
   const grid = Array.from({ length: size }, () => Array(size).fill(''));
   const placedWords = [];
-  // Place longest words first — easier when the grid is still empty
   const sorted = [...wordStrings].sort((a, b) => b.length - a.length);
   for (const word of sorted) {
-    if (word.length > size) {
-      console.warn('[puzzle] Skipping word too long for grid:', word);
-      continue;
-    }
+    if (word.length > size) { console.warn('[puzzle] Skipping (too long):', word); continue; }
     const placed = tryPlace(grid, word, size);
     if (placed) placedWords.push(placed);
-    else console.warn('[puzzle] Could not place word:', word);
+    else console.warn('[puzzle] Could not place:', word);
   }
-  // Fill remaining cells with random letters
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   for (let r = 0; r < size; r++)
     for (let c = 0; c < size; c++)
@@ -76,38 +70,27 @@ function buildGrid(wordStrings, size = 15) {
 
 // ── main export ───────────────────────────────────────────────────────────────
 
-/**
- * generatePuzzle({ count, category })
- *
- * Fetches `count` random active words from the `words` MongoDB collection,
- * builds a 15×15 grid, and returns { grid, words, source }.
- *
- * `source` is either 'database' or 'fallback' — useful for logging.
- */
 async function generatePuzzle({ count = 12, category = null } = {}) {
   const filter = { active: true };
   if (category) filter.category = category;
 
+  // Count first so we can give an accurate warning
+  const total = await Word.countDocuments(filter);
+  console.log('[puzzle] Words available in DB:', total);
+
   let wordStrings;
   let source;
 
-  try {
-    // Fetch a few extra so we still hit `count` even if some fail to place
+  if (total > 0) {
     const docs = await Word.aggregate([
       { $match: filter },
       { $sample: { size: count + 8 } }
     ]);
-
-    if (docs.length > 0) {
-      wordStrings = docs.map(d => d.word.toUpperCase()).slice(0, count);
-      source = 'database';
-      console.log('[puzzle] Using ' + wordStrings.length + ' words from MongoDB:', wordStrings.join(', '));
-    } else {
-      throw new Error('empty');
-    }
-  } catch (err) {
-    // Collection is empty or query failed — use built-in fallback
-    console.warn('[puzzle] Word collection empty or unavailable — using fallback list.');
+    wordStrings = docs.map(d => d.word.toUpperCase()).slice(0, count);
+    source = 'database';
+    console.log('[puzzle] Picked from DB:', wordStrings.join(', '));
+  } else {
+    console.warn('[puzzle] No words in DB — using hardcoded fallback. Add words to the "words" collection!');
     wordStrings = shuffle([
       'PUZZLE','SEARCH','BATTLE','HIDDEN','WORDS','GRID',
       'VICTORY','PLAYER','SCORE','FIND','DIAGONAL','ACROSS',

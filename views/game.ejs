@@ -17,6 +17,8 @@
       --accent2: #5c5a9f;
       --text:    #1e1030;
       --muted:   #7a6e99;
+      --radius:  12px;
+      --radius-sm: 8px;
     }
 
     body {
@@ -28,7 +30,6 @@
       flex-direction: column;
     }
 
-    /* ── header ── */
     header {
       border-bottom: 1px solid var(--border);
       padding: 0.8rem 1.5rem;
@@ -43,15 +44,16 @@
     .code-badge { font-size:0.65rem; color:var(--muted); letter-spacing:2px; }
     .code-badge strong { color:var(--accent); font-size:0.9rem; letter-spacing:4px; cursor:pointer; }
     .code-badge strong:hover { text-decoration:underline; }
-    .status-pill { margin-left:auto; font-size:0.6rem; letter-spacing:2px; text-transform:uppercase; padding:0.25rem 0.7rem; border:1px solid; }
+    .status-pill {
+      margin-left:auto; font-size:0.6rem; letter-spacing:2px; text-transform:uppercase;
+      padding:0.3rem 0.9rem; border:1px solid; border-radius:999px;
+    }
     .status-pill.waiting  { border-color:var(--muted);   color:var(--muted);   }
     .status-pill.playing  { border-color:var(--accent);  color:var(--accent);  }
     .status-pill.finished { border-color:var(--accent2); color:var(--accent2); }
 
-    /* ── layout ── */
     .layout { display:flex; flex:1; overflow:hidden; }
 
-    /* ── sidebar ── */
     .sidebar {
       width: 220px;
       flex-shrink: 0;
@@ -67,154 +69,139 @@
     .player-item { display:flex; align-items:center; justify-content:space-between; padding:0.35rem 0; }
     .player-name { font-size:0.7rem; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap; }
     .player-name .crown { color:var(--accent); }
-    .player-name .me { color:var(--accent2); font-size:0.52rem; border:1px solid var(--accent2); padding:0.1rem 0.25rem; }
+    .player-name .me {
+      color:var(--accent2); font-size:0.52rem;
+      border:1px solid var(--accent2); padding:0.1rem 0.4rem;
+      border-radius: 999px;
+    }
     .player-score { font-size:0.9rem; font-weight:700; color:var(--accent); }
 
-    /* words list */
-    .words-section {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-    }
+    .words-section { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
     .words-header {
       padding: 0.8rem 1rem 0.4rem;
-      font-size: 0.58rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 700;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      position: sticky;
-      top: 0;
+      font-size: 0.58rem; letter-spacing:2px; text-transform:uppercase;
+      color:var(--muted); font-weight:700;
+      border-bottom:1px solid var(--border);
+      background:var(--surface);
+      position:sticky; top:0;
     }
-    .words-body { padding: 0.5rem; }
+    .words-body { padding:0.6rem; }
     .word-item {
-      font-size: 0.68rem;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      padding: 0.35rem 0.6rem;
-      margin-bottom: 0.25rem;
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--bg);
-      transition: all 0.2s;
+      font-size:0.68rem; letter-spacing:1px; text-transform:uppercase;
+      padding:0.35rem 0.7rem; margin-bottom:0.3rem;
+      border:1px solid var(--border);
+      border-radius: var(--radius-sm);
+      display:flex; align-items:center; justify-content:space-between;
+      background:var(--bg); transition:all 0.2s;
     }
     .word-item.found-other {
-      border-color: var(--border);
-      background: var(--surface);
-      opacity: 0.55;
-      text-decoration: line-through;
+      background:var(--surface); opacity:0.5; text-decoration:line-through;
     }
     .word-item.found-mine {
-      border-color: var(--accent);
-      background: rgba(118,73,118,0.08);
-      opacity: 1;
+      border-color:var(--accent); background:rgba(118,73,118,0.08);
     }
     .word-item .found-by { font-size:0.52rem; color:var(--muted); margin-left:0.3rem; white-space:nowrap; }
     .word-item.found-mine .found-by { color:var(--accent); }
 
-    /* ── grid area ── */
-    .game-area { flex:1; display:flex; align-items:center; justify-content:center; padding:1rem; overflow:auto; background:var(--bg); }
+    .game-area { flex:1; display:flex; align-items:center; justify-content:center; padding:1.5rem; overflow:auto; background:var(--bg); }
     #wordGrid {
-      display: grid;
-      border: 2px solid var(--border);
-      cursor: crosshair;
-      user-select: none;
-      -webkit-user-select: none;
-      background: var(--surface);
+      display:grid;
+      border:2px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor:crosshair;
+      user-select:none; -webkit-user-select:none;
+      background:var(--surface);
+      box-shadow: 0 4px 24px rgba(118,73,118,0.10);
     }
     .cell {
-      width: 36px; height: 36px;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1rem; letter-spacing: 1px;
-      color: var(--text);
-      border: 1px solid rgba(185,173,230,0.25);
-      transition: background 0.08s, color 0.08s;
+      width:36px; height:36px;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:1px;
+      color:var(--text);
+      border:1px solid rgba(185,173,230,0.2);
+      transition:background 0.08s, color 0.08s;
     }
-    .cell.selecting   { background: rgba(118,73,118,0.18); color: var(--accent); }
-    .cell.found-mine  { background: rgba(118,73,118,0.22); color: var(--accent);  font-weight: bold; }
-    .cell.found-other { background: rgba(92,90,159,0.15);  color: var(--accent2); }
+    .cell.selecting   { background:rgba(118,73,118,0.18); color:var(--accent); }
+    .cell.found-mine  { background:rgba(118,73,118,0.22); color:var(--accent); font-weight:bold; }
+    .cell.found-other { background:rgba(92,90,159,0.15);  color:var(--accent2); }
 
-    /* ── overlays ── */
+    /* overlays */
     .overlay {
-      position: fixed; inset: 0;
-      background: rgba(30,16,48,0.55);
-      backdrop-filter: blur(3px);
-      z-index: 50;
-      display: flex; align-items: center; justify-content: center;
+      position:fixed; inset:0;
+      background:rgba(30,16,48,0.45);
+      backdrop-filter:blur(6px);
+      z-index:50; display:flex; align-items:center; justify-content:center;
     }
     .overlay-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      padding: 2.5rem;
-      width: 460px; max-width: 95vw;
-      text-align: center;
-      box-shadow: 0 8px 40px rgba(118,73,118,0.15);
+      background:var(--bg);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding:2.5rem; width:460px; max-width:95vw;
+      text-align:center;
+      box-shadow:0 12px 48px rgba(118,73,118,0.18);
     }
     .overlay-box h2 { font-family:'Bebas Neue',sans-serif; font-size:2.2rem; letter-spacing:3px; color:var(--text); }
     .lobby-code {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 3.5rem; letter-spacing: 8px;
-      color: var(--accent); margin: 1rem 0;
-      cursor: pointer;
+      font-family:'Bebas Neue',sans-serif; font-size:3.5rem; letter-spacing:8px;
+      color:var(--accent); margin:1rem 0; cursor:pointer;
     }
-    .lobby-code:hover { opacity: 0.8; }
+    .lobby-code:hover { opacity:0.8; }
     .lobby-hint { font-size:0.62rem; color:var(--muted); letter-spacing:1px; margin-bottom:1.5rem; }
     .lobby-players { margin-bottom:1.5rem; text-align:left; }
     .lobby-player {
-      padding: 0.45rem 0.8rem;
-      border: 1px solid var(--border);
-      margin-bottom: 0.3rem;
-      font-size: 0.72rem;
-      display: flex; justify-content: space-between; align-items: center;
-      background: var(--surface);
+      padding:0.45rem 0.9rem; border:1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom:0.35rem; font-size:0.72rem;
+      display:flex; justify-content:space-between; align-items:center;
+      background:var(--surface);
     }
-    .host-tag { font-size:0.52rem; color:var(--accent); border:1px solid var(--accent); padding:0.1rem 0.3rem; }
+    .host-tag {
+      font-size:0.52rem; color:var(--accent);
+      border:1px solid var(--accent); padding:0.1rem 0.45rem;
+      border-radius:999px;
+    }
 
     .btn {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.72rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
-      padding: 0.85rem 1.8rem; border: none; cursor: pointer; transition: 0.2s;
+      font-family:'Space Mono',monospace; font-size:0.72rem; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:0.85rem 1.8rem; border:none; cursor:pointer;
+      border-radius: var(--radius-sm); transition:0.2s;
     }
     .btn-accent  { background:var(--accent);  color:#fff; }
     .btn-accent:hover  { background:var(--accent2); }
     .btn-outline { background:transparent; border:1px solid var(--border); color:var(--muted); }
     .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
 
-    /* game over */
     .score-list { margin:1.2rem 0; }
     .score-item {
       display:flex; align-items:center; justify-content:space-between;
-      padding:0.55rem 0.8rem; margin-bottom:0.3rem;
-      border:1px solid var(--border); background:var(--surface);
+      padding:0.55rem 0.9rem; margin-bottom:0.35rem;
+      border:1px solid var(--border); border-radius:var(--radius-sm);
+      background:var(--surface);
     }
     .score-item.winner { border-color:var(--accent); background:rgba(118,73,118,0.07); }
     .score-item .rank  { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; color:var(--muted); margin-right:0.8rem; }
     .score-item .sname { font-size:0.78rem; }
     .score-item .sscore { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; color:var(--accent); }
-    .winner-badge { font-size:0.55rem; border:1px solid var(--accent); color:var(--accent); padding:0.1rem 0.35rem; letter-spacing:1px; margin-left:0.4rem; }
+    .winner-badge {
+      font-size:0.55rem; border:1px solid var(--accent); color:var(--accent);
+      padding:0.1rem 0.4rem; border-radius:999px; letter-spacing:1px; margin-left:0.4rem;
+    }
 
-    /* toast */
     .copied-toast {
       position:fixed; bottom:2rem; right:2rem;
       background:var(--accent); color:#fff;
-      padding:0.6rem 1.1rem; font-size:0.68rem; font-weight:700; letter-spacing:1px;
+      padding:0.6rem 1.2rem; font-size:0.68rem; font-weight:700; letter-spacing:1px;
+      border-radius:var(--radius-sm);
       opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:200;
     }
     .copied-toast.show { opacity:1; }
 
-    /* waiting state hint */
     #waitingHint { font-size:0.7rem; color:var(--muted); margin-top:0.8rem; }
 
-    @media (max-width: 700px) {
-      .sidebar { width: 160px; }
+    @media (max-width:700px) {
+      .sidebar { width:160px; }
       .cell { width:24px; height:24px; font-size:0.78rem; }
     }
   </style>
@@ -242,7 +229,6 @@
     </div>
   </div>
 
-  <!-- Lobby overlay -->
   <div class="overlay" id="lobbyOverlay">
     <div class="overlay-box">
       <h2>GAME LOBBY</h2>
@@ -254,7 +240,6 @@
     </div>
   </div>
 
-  <!-- Game Over overlay -->
   <div class="overlay" id="gameOverOverlay" style="display:none">
     <div class="overlay-box">
       <h2>GAME OVER</h2>
@@ -273,69 +258,39 @@
   <script>
     const GAME_CODE   = '<%= gameCode %>';
     const PLAYER_NAME = sessionStorage.getItem('playerName') || '';
-
-    let isHost = false;
-    let gameState = null;
-    let selecting = false;
-    let startCell = null;
-    let currentSelection = [];
-    let foundCells = {};            // "r-c" → 'mine' | 'other'
+    let isHost = false, gameState = null, selecting = false;
+    let startCell = null, currentSelection = [], foundCells = {};
     let gridListenersAttached = false;
 
-    if (!PLAYER_NAME) {
-      window.location.href = '/games/word-search-battle';
-    }
-
-    // ── socket ────────────────────────────────────────────────────────────────
+    if (!PLAYER_NAME) window.location.href = '/games/word-search-battle';
 
     const socket = io();
 
-    socket.on('connect', () => {
-      socket.emit('joinRoom', { gameCode: GAME_CODE, playerName: PLAYER_NAME });
-    });
+    socket.on('connect', () => socket.emit('joinRoom', { gameCode: GAME_CODE, playerName: PLAYER_NAME }));
 
-    socket.on('gameState', state => {
-      gameState = state;
-      rebuildFoundCells();
-      renderAll();
-    });
+    socket.on('gameState', state => { gameState = state; rebuildFoundCells(); renderAll(); });
 
     socket.on('playerJoined', ({ players }) => {
       if (!gameState) return;
       gameState.players = players;
-      renderPlayers();
-      renderLobby();
+      renderPlayers(); renderLobby();
     });
 
     socket.on('gameStarted', state => {
-      gameState = state;
-      rebuildFoundCells();
+      gameState = state; rebuildFoundCells();
       document.getElementById('lobbyOverlay').style.display = 'none';
-      updateStatusPill('playing');
-      attachGridListeners();
-      renderAll();
+      updateStatusPill('playing'); attachGridListeners(); renderAll();
     });
 
     socket.on('wordClaimed', ({ word, playerName, positions, players, gameOver, winner, finalScores }) => {
       if (!gameState) return;
       gameState.players = players;
-
-      // Update local word entry
       const entry = gameState.words.find(w => w.word === word);
-      if (entry) {
-        entry.foundBy   = playerName;
-        entry.positions = positions;
-      }
-
-      // Mark cells
+      if (entry) { entry.foundBy = playerName; entry.positions = positions; }
       positions.forEach(pos => {
         foundCells[pos.row + '-' + pos.col] = (playerName === PLAYER_NAME) ? 'mine' : 'other';
       });
-
-      renderPlayers();
-      renderWords();
-      renderGrid();
-
+      renderPlayers(); renderWords(); renderGrid();
       if (gameOver) showGameOver(winner, finalScores);
     });
 
@@ -344,31 +299,24 @@
       window.location.href = '/games/word-search-battle/game/' + newGameCode;
     });
 
-    // ── helpers ───────────────────────────────────────────────────────────────
-
     function rebuildFoundCells() {
       foundCells = {};
       if (!gameState || !gameState.words) return;
       gameState.words.forEach(w => {
-        if (w.foundBy && w.positions) {
+        if (w.foundBy && w.positions)
           w.positions.forEach(pos => {
             foundCells[pos.row + '-' + pos.col] = (w.foundBy === PLAYER_NAME) ? 'mine' : 'other';
           });
-        }
       });
     }
 
     function renderAll() {
-      renderGrid();
-      renderWords();
-      renderPlayers();
-
+      renderGrid(); renderWords(); renderPlayers();
       if (gameState.status === 'waiting') {
         renderLobby();
       } else if (gameState.status === 'playing') {
         document.getElementById('lobbyOverlay').style.display = 'none';
-        updateStatusPill('playing');
-        attachGridListeners();
+        updateStatusPill('playing'); attachGridListeners();
       } else if (gameState.status === 'finished') {
         document.getElementById('lobbyOverlay').style.display = 'none';
         updateStatusPill('finished');
@@ -376,25 +324,21 @@
       }
     }
 
-    // Attach grid listeners exactly once
     function attachGridListeners() {
       if (gridListenersAttached) return;
       gridListenersAttached = true;
       const el = document.getElementById('wordGrid');
-      el.addEventListener('mousedown',  onMouseDown);
-      el.addEventListener('mouseover',  onMouseOver);
+      el.addEventListener('mousedown', onMouseDown);
+      el.addEventListener('mouseover', onMouseOver);
       document.addEventListener('mouseup', onMouseUp);
       el.addEventListener('touchstart', onTouchStart, { passive: false });
       el.addEventListener('touchmove',  onTouchMove,  { passive: false });
       el.addEventListener('touchend',   onTouchEnd);
     }
 
-    // ── render grid ───────────────────────────────────────────────────────────
-
     function renderGrid() {
       if (!gameState || !gameState.grid) return;
-      const grid = gameState.grid;
-      const size = grid.length;
+      const grid = gameState.grid, size = grid.length;
       const el = document.getElementById('wordGrid');
       el.style.gridTemplateColumns = 'repeat(' + size + ', 1fr)';
       el.innerHTML = '';
@@ -403,8 +347,7 @@
           const cell = document.createElement('div');
           cell.className = 'cell';
           cell.textContent = grid[r][c];
-          cell.dataset.r = r;
-          cell.dataset.c = c;
+          cell.dataset.r = r; cell.dataset.c = c;
           const key = r + '-' + c;
           if      (foundCells[key] === 'mine')  cell.classList.add('found-mine');
           else if (foundCells[key] === 'other') cell.classList.add('found-other');
@@ -414,33 +357,21 @@
       }
     }
 
-    // ── render words list ─────────────────────────────────────────────────────
-
     function renderWords() {
       if (!gameState || !gameState.words) return;
-      const words  = gameState.words;
-      const found  = words.filter(w => w.foundBy).length;
-      const total  = words.length;
-
+      const words = gameState.words;
       document.getElementById('wordsHeader').textContent =
-        'Words — ' + found + ' / ' + total;
-
+        'Words — ' + words.filter(w => w.foundBy).length + ' / ' + words.length;
       const body = document.getElementById('wordsBody');
       body.innerHTML = '';
-
       words.forEach(w => {
         const div = document.createElement('div');
-        let cls = 'word-item';
-        if (w.foundBy) cls += (w.foundBy === PLAYER_NAME) ? ' found-mine' : ' found-other';
-        div.className = cls;
-        div.innerHTML =
-          '<span>' + w.word + '</span>' +
+        div.className = 'word-item' + (w.foundBy ? (w.foundBy === PLAYER_NAME ? ' found-mine' : ' found-other') : '');
+        div.innerHTML = '<span>' + w.word + '</span>' +
           (w.foundBy ? '<span class="found-by">' + w.foundBy + '</span>' : '');
         body.appendChild(div);
       });
     }
-
-    // ── render players ────────────────────────────────────────────────────────
 
     function renderPlayers() {
       if (!gameState) return;
@@ -450,37 +381,25 @@
         const me = p.name === PLAYER_NAME;
         if (me && p.isHost) isHost = true;
         return '<div class="player-item">' +
-          '<div class="player-name">' +
-            (p.isHost ? '<span class="crown">★</span>' : '') +
-            p.name +
-            (me ? '<span class="me">YOU</span>' : '') +
-          '</div>' +
-          '<div class="player-score">' + p.score + '</div>' +
-        '</div>';
+          '<div class="player-name">' + (p.isHost ? '<span class="crown">★</span>' : '') + p.name +
+          (me ? '<span class="me">YOU</span>' : '') + '</div>' +
+          '<div class="player-score">' + p.score + '</div></div>';
       }).join('');
     }
 
-    // ── render lobby ──────────────────────────────────────────────────────────
-
     function renderLobby() {
       if (!gameState || gameState.status !== 'waiting') return;
-      const el = document.getElementById('lobbyPlayers');
-      el.innerHTML = gameState.players.map(p =>
-        '<div class="lobby-player">' +
-          '<span>' + p.name + (p.name === PLAYER_NAME ? ' (you)' : '') + '</span>' +
-          (p.isHost ? '<span class="host-tag">HOST</span>' : '') +
-        '</div>'
+      document.getElementById('lobbyPlayers').innerHTML = gameState.players.map(p =>
+        '<div class="lobby-player"><span>' + p.name + (p.name === PLAYER_NAME ? ' (you)' : '') + '</span>' +
+        (p.isHost ? '<span class="host-tag">HOST</span>' : '') + '</div>'
       ).join('');
-
       const me = gameState.players.find(p => p.name === PLAYER_NAME);
       if (me && me.isHost) {
         isHost = true;
-        document.getElementById('startBtn').style.display  = 'block';
+        document.getElementById('startBtn').style.display = 'block';
         document.getElementById('waitingHint').style.display = 'none';
       }
     }
-
-    // ── game over ─────────────────────────────────────────────────────────────
 
     function showGameOver(winner, scores) {
       updateStatusPill('finished');
@@ -491,18 +410,15 @@
       document.getElementById('finalScores').innerHTML = sorted.map((p, i) => {
         const win = p.name === winner;
         return '<div class="score-item' + (win ? ' winner' : '') + '">' +
-          '<span class="rank">#' + (i + 1) + '</span>' +
+          '<span class="rank">#' + (i+1) + '</span>' +
           '<span class="sname">' + p.name + (win ? ' <span class="winner-badge">WINNER</span>' : '') + '</span>' +
-          '<span class="sscore">' + p.score + '</span>' +
-        '</div>';
+          '<span class="sscore">' + p.score + '</span></div>';
       }).join('');
       if (isHost) document.getElementById('playAgainBtn').style.display = 'block';
     }
 
-    // ── actions ───────────────────────────────────────────────────────────────
-
-    function startGame()  { socket.emit('startGame',  { gameCode: GAME_CODE, playerName: PLAYER_NAME }); }
-    function playAgain()  { socket.emit('playAgain',  { gameCode: GAME_CODE, playerName: PLAYER_NAME }); }
+    function startGame() { socket.emit('startGame', { gameCode: GAME_CODE, playerName: PLAYER_NAME }); }
+    function playAgain() { socket.emit('playAgain', { gameCode: GAME_CODE, playerName: PLAYER_NAME }); }
 
     function updateStatusPill(status) {
       const pill = document.getElementById('statusPill');
@@ -517,58 +433,26 @@
       setTimeout(() => t.classList.remove('show'), 2000);
     }
 
-    // ── grid interaction ──────────────────────────────────────────────────────
-
     function getCell(e) {
       let target = e.target;
       if (e.touches) target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
       if (!target || !target.dataset || target.dataset.r === undefined) return null;
       return { r: parseInt(target.dataset.r), c: parseInt(target.dataset.c) };
     }
-
-    function onMouseDown(e) {
-      e.preventDefault();
-      const cell = getCell(e);
-      if (!cell) return;
-      selecting = true; startCell = cell; currentSelection = [cell];
-      renderGrid();
-    }
-    function onMouseOver(e) {
-      if (!selecting || !startCell) return;
-      const cell = getCell(e);
-      if (cell) { currentSelection = getLine(startCell, cell); renderGrid(); }
-    }
-    function onMouseUp() {
-      if (!selecting) return;
-      selecting = false; submitSelection();
-    }
-    function onTouchStart(e) {
-      e.preventDefault();
-      const cell = getCell(e);
-      if (!cell) return;
-      selecting = true; startCell = cell; currentSelection = [cell];
-      renderGrid();
-    }
-    function onTouchMove(e) {
-      e.preventDefault();
-      if (!selecting) return;
-      const cell = getCell(e);
-      if (cell) { currentSelection = getLine(startCell, cell); renderGrid(); }
-    }
-    function onTouchEnd() {
-      if (!selecting) return;
-      selecting = false; submitSelection();
-    }
+    function onMouseDown(e) { e.preventDefault(); const c = getCell(e); if (!c) return; selecting=true; startCell=c; currentSelection=[c]; renderGrid(); }
+    function onMouseOver(e) { if (!selecting||!startCell) return; const c=getCell(e); if(c){currentSelection=getLine(startCell,c);renderGrid();} }
+    function onMouseUp()    { if (!selecting) return; selecting=false; submitSelection(); }
+    function onTouchStart(e){ e.preventDefault(); const c=getCell(e); if(!c) return; selecting=true; startCell=c; currentSelection=[c]; renderGrid(); }
+    function onTouchMove(e) { e.preventDefault(); if(!selecting) return; const c=getCell(e); if(c){currentSelection=getLine(startCell,c);renderGrid();} }
+    function onTouchEnd()   { if(!selecting) return; selecting=false; submitSelection(); }
 
     function getLine(a, b) {
-      const dr = b.r - a.r, dc = b.c - a.c;
-      const len = Math.max(Math.abs(dr), Math.abs(dc));
-      if (len === 0) return [a];
-      if (Math.abs(dr) !== Math.abs(dc) && dr !== 0 && dc !== 0) return [a];
-      const sr = dr === 0 ? 0 : dr / Math.abs(dr);
-      const sc = dc === 0 ? 0 : dc / Math.abs(dc);
-      const cells = [];
-      for (let i = 0; i <= len; i++) cells.push({ r: a.r + sr * i, c: a.c + sc * i });
+      const dr=b.r-a.r, dc=b.c-a.c, len=Math.max(Math.abs(dr),Math.abs(dc));
+      if (len===0) return [a];
+      if (Math.abs(dr)!==Math.abs(dc) && dr!==0 && dc!==0) return [a];
+      const sr=dr===0?0:dr/Math.abs(dr), sc=dc===0?0:dc/Math.abs(dc);
+      const cells=[];
+      for(let i=0;i<=len;i++) cells.push({r:a.r+sr*i, c:a.c+sc*i});
       return cells;
     }
 
@@ -576,17 +460,9 @@
       if (!currentSelection.length || !gameState) return;
       const word = currentSelection.map(p => gameState.grid[p.r][p.c]).join('');
       const rev  = word.split('').reverse().join('');
-      const entry = gameState.words.find(w => (w.word === word || w.word === rev) && !w.foundBy);
-      if (entry) {
-        socket.emit('wordFound', {
-          gameCode:   GAME_CODE,
-          playerName: PLAYER_NAME,
-          word:       entry.word,
-          positions:  currentSelection
-        });
-      }
-      currentSelection = [];
-      renderGrid();
+      const entry = gameState.words.find(w => (w.word===word||w.word===rev) && !w.foundBy);
+      if (entry) socket.emit('wordFound', { gameCode:GAME_CODE, playerName:PLAYER_NAME, word:entry.word, positions:currentSelection });
+      currentSelection = []; renderGrid();
     }
   </script>
 </body>

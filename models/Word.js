@@ -1,23 +1,25 @@
 const mongoose = require('mongoose');
 
 /**
- * WordPool — the collection you fill with words for the puzzles.
+ * WordPool — fill this collection with words for the puzzles.
  *
- * Each document is one word. Fields:
- *   word     : the word in uppercase (required, unique)
- *   category : optional grouping tag  (e.g. "animals", "science", "custom")
- *   active   : set to false to exclude a word without deleting it
+ * Fields:
+ *   word     : the word in UPPERCASE (required, unique)
+ *   category : optional tag, e.g. "animals", "science"   (default: "general")
+ *   active   : set false to hide a word without deleting it  (default: true)
  *
- * Example documents:
- *   { word: "ELEPHANT", category: "animals",  active: true }
- *   { word: "VOLCANO",  category: "science",  active: true }
+ * The collection name is pinned to "words" explicitly so Mongoose
+ * pluralization can never cause a mismatch with what Atlas shows.
  */
-const WordSchema = new mongoose.Schema({
-  word:     { type: String, required: true, unique: true, uppercase: true, trim: true },
-  category: { type: String, default: 'general', lowercase: true, trim: true },
-  active:   { type: Boolean, default: true },
-  addedAt:  { type: Date, default: Date.now }
-});
+const WordSchema = new mongoose.Schema(
+  {
+    word:     { type: String, required: true, unique: true, trim: true },
+    category: { type: String, default: 'general', trim: true },
+    active:   { type: Boolean, default: true },
+    addedAt:  { type: Date,    default: Date.now }
+  },
+  { collection: 'words' }   // ← explicit collection name
+);
 
 WordSchema.index({ active: 1, category: 1 });
 

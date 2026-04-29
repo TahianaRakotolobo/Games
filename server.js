@@ -1,16 +1,14 @@
 const express = require('express');
-const http = require('http');
+const http    = require('http');
 const { Server } = require('socket.io');
-const path = require('path');
+const path    = require('path');
 const connectDB = require('./config/db');
-const Game = require('./models/Game');
+const Game    = require('./models/Game');
 const { generatePuzzle, generateCode } = require('./utils/puzzle');
 
-const app = express();
+const app    = express();
 const server = http.createServer(app);
-const io = new Server(server);
-
-connectDB();
+const io     = new Server(server);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -30,10 +28,8 @@ io.on('connection', (socket) => {
     socket.join(gameCode);
     const game = await Game.findOne({ gameCode });
     if (!game) return;
-
     const player = game.players.find(p => p.name === playerName);
     if (player) { player.socketId = socket.id; await game.save(); }
-
     socket.emit('gameState', buildGameState(game));
     socket.to(gameCode).emit('playerJoined', {
       playerName,
@@ -46,27 +42,21 @@ io.on('connection', (socket) => {
     if (!game) return;
     const player = game.players.find(p => p.name === playerName);
     if (!player || !player.isHost || game.status !== 'waiting') return;
-
     game.status = 'playing';
     game.startedAt = new Date();
     await game.save();
-
     io.to(gameCode).emit('gameStarted', buildGameState(game));
   });
 
   socket.on('wordFound', async ({ gameCode, playerName, word, positions }) => {
     const game = await Game.findOne({ gameCode });
     if (!game || game.status !== 'playing') return;
-
     const wordEntry = game.words.find(w => w.word === word && !w.foundBy);
     if (!wordEntry) return;
-
     wordEntry.foundBy = playerName;
     wordEntry.foundAt = new Date();
-
     const player = game.players.find(p => p.name === playerName);
     if (player) { player.wordsFound.push(word); player.score += 1; }
-
     const allFound = game.words.every(w => w.foundBy);
     if (allFound) {
       game.status = 'finished';
@@ -76,12 +66,9 @@ io.on('connection', (socket) => {
       game.players.forEach(p => { if (p.score > maxScore) { maxScore = p.score; winner = p.name; } });
       game.winner = winner;
     }
-
     await game.save();
-
     io.to(gameCode).emit('wordClaimed', {
-      word,
-      playerName,
+      word, playerName,
       positions: wordEntry.positions,
       players: game.players.map(p => ({ name: p.name, score: p.score, wordsFound: p.wordsFound })),
       gameOver: game.status === 'finished',
@@ -95,31 +82,19 @@ io.on('connection', (socket) => {
     if (!oldGame) return;
     const player = oldGame.players.find(p => p.name === playerName);
     if (!player || !player.isHost) return;
-
-    // Pick a fresh set of words from the DB for the new round
     const newCode = generateCode();
     const { grid, words } = await generatePuzzle();
-
     const newGame = new Game({
-      gameCode: newCode,
-      grid,
-      words,
+      gameCode: newCode, grid, words,
       players: oldGame.players.map(p => ({
-        name: p.name,
-        isHost: p.isHost,
-        socketId: p.socketId,
-        score: 0,
-        wordsFound: []
+        name: p.name, isHost: p.isHost, socketId: p.socketId, score: 0, wordsFound: []
       }))
     });
-
     await newGame.save();
     io.to(gameCode).emit('newGameReady', { newGameCode: newCode });
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
+  socket.on('disconnect', () => { console.log('User disconnected:', socket.id); });
 });
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -127,20 +102,28 @@ io.on('connection', (socket) => {
 function buildGameState(game) {
   return {
     gameCode: game.gameCode,
-    status: game.status,
-    grid: game.grid,
-    words: game.words.map(w => ({
-      word: w.word,
-      foundBy: w.foundBy || null,
-      positions: w.positions || []  // always send positions; client ignores them for unfound words
+    status:   game.status,
+    grid:     game.grid,
+    words:    game.words.map(w => ({
+      word:      w.word,
+      foundBy:   w.foundBy || null,
+      positions: w.positions || []
     })),
-    players: game.players.map(p => ({ name: p.name, score: p.score, isHost: p.isHost, wordsFound: p.wordsFound })),
-    winner: game.winner,
-    startedAt: game.startedAt
+    players:    game.players.map(p => ({ name: p.name, score: p.score, isHost: p.isHost, wordsFound: p.wordsFound })),
+    winner:     game.winner,
+    startedAt:  game.startedAt
   };
 }
 
-// ── start ─────────────────────────────────────────────────────────────────────
+// ── start — wait for DB before accepting requests ─────────────────────────────
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+connectDB()
+  .then(() => {
+    server.listen(PORT, () => console.log('Server running on http://localhost:' + PORT));
+  })
+  .catch(err => {
+    console.error('Failed to connect to MongoDB:', err.message);
+    process.exit(1);
+  });
