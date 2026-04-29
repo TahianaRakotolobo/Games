@@ -179,9 +179,17 @@ pNamespace.on('connection', (socket) => {
     if (!round || round.drawerName === playerName) return;
     if (round.guessedBy.find(g => g.playerName === playerName)) return;
 
-    // Translate French → English, then compare
-    const translated = await translateToEnglish(guess);
-    const correct    = translated.trim().toLowerCase() === round.word.toLowerCase();
+    // Prioritize direct match first, translate only if needed
+    const rawMatch = guess.trim().toLowerCase() === round.word.toLowerCase();
+    let translated  = guess;
+    let wasTranslated = false;
+
+    if (!rawMatch) {
+      translated    = await translateToEnglish(guess);
+      wasTranslated = translated.trim().toLowerCase() !== guess.trim().toLowerCase();
+    }
+
+    const correct = rawMatch || translated.trim().toLowerCase() === round.word.toLowerCase();
 
     if (correct) {
       const elapsed = (Date.now() - new Date(round.startedAt).getTime()) / 1000;
@@ -197,12 +205,11 @@ pNamespace.on('connection', (socket) => {
 
       await game.save();
 
-      // Tell the guesser what their French word translated to
-      const wasTranslated = translated.trim().toLowerCase() !== guess.trim().toLowerCase();
+      // Tell the guesser what their guess translated to (only if translation was used)
       pNamespace.to(gameCode).emit('correctGuess', {
         playerName, points,
-        originalGuess:  guess,
-        translatedTo:   wasTranslated ? translated : null,
+        originalGuess: guess,
+        translatedTo:  wasTranslated ? translated : null,
         players: game.players.map(p => ({ name: p.name, score: p.score }))
       });
 
@@ -212,8 +219,7 @@ pNamespace.on('connection', (socket) => {
         await endRound(gameCode, true);
       }
     } else {
-      // Broadcast wrong guess — show translation hint if different
-      const wasTranslated = translated.trim().toLowerCase() !== guess.trim().toLowerCase();
+      // Broadcast wrong guess — show translation if one was attempted
       pNamespace.to(gameCode).emit('wrongGuess', {
         playerName, guess,
         translatedTo: wasTranslated ? translated : null
