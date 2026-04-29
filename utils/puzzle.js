@@ -1,13 +1,4 @@
-/**
- * puzzle.js — word fetching + grid generation
- *
- * Fetches random words from the `words` MongoDB collection.
- * Falls back to a built-in list ONLY if the collection is genuinely empty.
- */
-
 const Word = require('../models/Word');
-
-// ── utilities ─────────────────────────────────────────────────────────────────
 
 function shuffle(arr) {
   const a = [...arr];
@@ -24,8 +15,6 @@ function generateCode() {
   for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
   return code;
 }
-
-// ── grid placement ────────────────────────────────────────────────────────────
 
 function tryPlace(grid, word, size) {
   const directions = [[0,1],[1,0],[1,1],[-1,1],[0,-1],[-1,0],[-1,-1],[1,-1]];
@@ -68,18 +57,18 @@ function buildGrid(wordStrings, size = 15) {
   return { grid, words: placedWords };
 }
 
-// ── main export ───────────────────────────────────────────────────────────────
-
 async function generatePuzzle({ count = 12, category = null } = {}) {
+  const mongoose = require('mongoose');
+  console.log('[puzzle] Querying database:', mongoose.connection.name);
+  console.log('[puzzle] Collection: words');
+
   const filter = { active: true };
   if (category) filter.category = category;
 
-  // Count first so we can give an accurate warning
   const total = await Word.countDocuments(filter);
-  console.log('[puzzle] Words available in DB:', total);
+  console.log('[puzzle] Words found in DB:', total);
 
-  let wordStrings;
-  let source;
+  let wordStrings, source;
 
   if (total > 0) {
     const docs = await Word.aggregate([
@@ -88,9 +77,10 @@ async function generatePuzzle({ count = 12, category = null } = {}) {
     ]);
     wordStrings = docs.map(d => d.word.toUpperCase()).slice(0, count);
     source = 'database';
-    console.log('[puzzle] Picked from DB:', wordStrings.join(', '));
+    console.log('[puzzle] Using words from DB:', wordStrings.join(', '));
   } else {
-    console.warn('[puzzle] No words in DB — using hardcoded fallback. Add words to the "words" collection!');
+    console.warn('[puzzle] ⚠️  No words found — falling back to hardcoded list.');
+    console.warn('[puzzle] ⚠️  Make sure your Atlas URI contains "wordsearchbattle" as the database name.');
     wordStrings = shuffle([
       'PUZZLE','SEARCH','BATTLE','HIDDEN','WORDS','GRID',
       'VICTORY','PLAYER','SCORE','FIND','DIAGONAL','ACROSS',
