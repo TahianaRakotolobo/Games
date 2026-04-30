@@ -20,16 +20,17 @@ const RoundSchema = new mongoose.Schema({
 });
 
 const PicturizeGameSchema = new mongoose.Schema({
-  gameCode:    { type: String, required: true, unique: true, index: true },
-  status:      { type: String, enum: ['waiting','choosing','drawing','roundEnd','finished'], default: 'waiting' },
-  players:     [PlayerSchema],
-  rounds:      [RoundSchema],
-  currentRound:{ type: Number, default: 0 },
-  totalRounds: { type: Number, default: 3 },
-  winner:      { type: String, default: null },
-  createdAt:   { type: Date, default: Date.now },
-  startedAt:   Date,
-  finishedAt:  Date
+  gameCode:           { type: String, required: true, unique: true, index: true },
+  status:             { type: String, enum: ['waiting','choosing','drawing','roundEnd','finished'], default: 'waiting' },
+  players:            [PlayerSchema],
+  rounds:             [RoundSchema],
+  currentRound:       { type: Number, default: 0 },
+  totalRounds:        { type: Number, default: 3 },
+  selectedCategories: { type: [String], default: [] }, // empty = all categories
+  winner:             { type: String, default: null },
+  createdAt:          { type: Date, default: Date.now },
+  startedAt:          Date,
+  finishedAt:         Date
 });
 
 module.exports = mongoose.model('PicturizeGame', PicturizeGameSchema);

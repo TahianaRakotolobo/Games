@@ -13,6 +13,16 @@ function generateCode() {
 // Landing page
 router.get('/picturize', (req, res) => res.render('picturize'));
 
+// API: get all distinct categories from the word pool
+router.get('/picturize/categories', async (req, res) => {
+  try {
+    const categories = await Word.distinct('category', { active: true });
+    res.json({ success: true, categories: categories.sort() });
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
 // Game room
 router.get('/picturize/game/:gameCode', async (req, res) => {
   try {
@@ -25,12 +35,13 @@ router.get('/picturize/game/:gameCode', async (req, res) => {
 // Create game
 router.post('/picturize/create', async (req, res) => {
   try {
-    const { playerName, totalRounds } = req.body;
+    const { playerName, totalRounds, selectedCategories } = req.body;
     if (!playerName?.trim()) return res.json({ success: false, error: 'Player name is required.' });
     const gameCode = generateCode();
     const game = new PicturizeGame({
       gameCode,
       totalRounds: parseInt(totalRounds) || 3,
+      selectedCategories: Array.isArray(selectedCategories) ? selectedCategories : [],
       players: [{ name: playerName.trim(), isHost: true }]
     });
     await game.save();

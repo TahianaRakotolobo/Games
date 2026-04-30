@@ -221,6 +221,7 @@
       <div class="lobby-code" onclick="copyCode()"><%= gameCode %></div>
       <div class="lobby-hint">Partage ce code pour que tes amis rejoignent</div>
       <div class="player-chips" id="lobbyChips"></div>
+      <div id="lobbyCats" style="margin-bottom:0.8rem;font-size:0.58rem;color:var(--muted);"></div>
       <button class="btn btn-accent" id="startBtn" onclick="startGame()" style="display:none">Commencer →</button>
       <div id="waitHint" style="font-size:0.65rem;color:var(--muted);">En attente du créateur…</div>
     </div>
@@ -285,14 +286,14 @@
     socket.on('gameState', state => {
       players = state.players;
       renderPlayers(players, null);
-      renderLobby(players);
+      renderLobby(players, state.selectedCategories || []);
       const me = players.find(p=>p.name===PLAYER_NAME);
       if (me?.isHost) { isHost=true; document.getElementById('startBtn').style.display='block'; document.getElementById('waitHint').style.display='none'; }
       if (state.status!=='waiting') document.getElementById('lobbyOverlay').style.display='none';
     });
 
     socket.on('playerJoined', ({ playerName, players:pl }) => {
-      players=pl; renderLobby(players); renderPlayers(players,null);
+      players=pl; renderLobby(players, []); renderPlayers(players,null);
       addChat(playerName+' a rejoint la partie','system');
     });
 
@@ -474,7 +475,17 @@
     // ── Render ─────────────────────────────────────────────────────────────────
     function renderPlayers(pl,drawerName){ const l=document.getElementById('playerList'); l.innerHTML=[...pl].sort((a,b)=>b.score-a.score).map(p=>{ const me=p.name===PLAYER_NAME; if(me&&p.isHost)isHost=true; const dr=p.name===drawerName; return '<div class="player-row'+(dr?' drawing':'')+'"><div class="pname">'+(dr?'✏️ ':'')+( p.isHost?'<span class="crown">★</span>':'')+' <span class="pname-text">'+p.name.substring(0,12)+'</span>'+(me?'<span class="me-tag">TOI</span>':'')+'</div><div class="pscore">'+p.score+'</div></div>'; }).join(''); }
 
-    function renderLobby(pl){ document.getElementById('lobbyChips').innerHTML=pl.map(p=>'<div class="chip">'+(p.isHost?'<span class="hdot"></span>':'')+p.name+(p.name===PLAYER_NAME?' (toi)':'')+'</div>').join(''); }
+    function renderLobby(pl, cats) {
+      document.getElementById('lobbyChips').innerHTML = pl.map(p =>
+        '<div class="chip">' + (p.isHost?'<span class="hdot"></span>':'') + p.name + (p.name===PLAYER_NAME?' (toi)':'') + '</div>'
+      ).join('');
+      const catsEl = document.getElementById('lobbyCats');
+      if (cats && cats.length > 0) {
+        catsEl.textContent = '📂 Catégories : ' + cats.join(', ');
+      } else {
+        catsEl.textContent = '📂 Catégories : toutes';
+      }
+    }
 
     function renderScoreList(id,pl){ const s=[...pl].sort((a,b)=>b.score-a.score); document.getElementById(id).innerHTML=s.map((p,i)=>'<div class="score-row'+(i===0?' wr':'')+'"><span class="rank">#'+(i+1)+'</span><span class="sname">'+p.name+(i===0?'<span class="wbadge">WINNER</span>':'')+'</span><span class="sscore">'+p.score+'</span></div>').join(''); }
 

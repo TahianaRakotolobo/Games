@@ -267,7 +267,15 @@ async function startNextRound(game) {
   game.currentRound += 1;
   game.status = 'choosing';
 
-  const words = await Word.aggregate([{ $match: { active: true } }, { $sample: { size: 3 } }]);
+  const words = await Word.aggregate([
+    { $match: {
+        active: true,
+        ...(game.selectedCategories?.length > 0
+          ? { category: { $in: game.selectedCategories } }
+          : {})
+    }},
+    { $sample: { size: 3 } }
+  ]);
   const choices = words.length >= 3
     ? words.map(w => ({ word: w.word.toUpperCase(), category: w.category }))
     : [{ word:'ELEPHANT',category:'animals' },{ word:'VOLCANO',category:'science' },{ word:'GUITAR',category:'music' }];
@@ -347,9 +355,13 @@ async function endRound(gameCode, allGuessed) {
 
 function buildPState(game) {
   return {
-    gameCode: game.gameCode, status: game.status,
-    players: game.players.map(p => ({ name: p.name, score: p.score, isHost: p.isHost })),
-    currentRound: game.currentRound, totalRounds: game.totalRounds, winner: game.winner
+    gameCode:           game.gameCode,
+    status:             game.status,
+    players:            game.players.map(p => ({ name: p.name, score: p.score, isHost: p.isHost })),
+    currentRound:       game.currentRound,
+    totalRounds:        game.totalRounds,
+    selectedCategories: game.selectedCategories || [],
+    winner:             game.winner
   };
 }
 

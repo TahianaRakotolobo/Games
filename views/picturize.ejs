@@ -7,54 +7,65 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:#fafafa; --surface:#e9e9e9; --border:#b9ade6;
-      --accent:#764976; --accent2:#5c5a9f; --text:#1e1030; --muted:#7a6e99;
-      --radius:16px; --radius-sm:10px;
-    }
-    body { background:var(--bg); color:var(--text); font-family:'Space Mono',monospace; min-height:100vh; }
-    body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(118,73,118,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(118,73,118,0.06) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; }
-    header { border-bottom:1px solid var(--border); padding:1.2rem 3rem; display:flex; align-items:center; gap:2rem; background:var(--bg); }
-    .logo { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:4px; color:var(--accent); text-decoration:none; }
-    .logo span { color:var(--accent2); }
-    nav a { font-size:0.68rem; color:var(--muted); text-decoration:none; letter-spacing:1px; text-transform:uppercase; }
-    nav a:hover { color:var(--accent); }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafafa;--surface:#e9e9e9;--border:#b9ade6;--accent:#764976;--accent2:#5c5a9f;--text:#1e1030;--muted:#7a6e99;--radius:16px;--radius-sm:10px}
+    body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(118,73,118,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(118,73,118,0.06) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+    header{border-bottom:1px solid var(--border);padding:1.2rem 3rem;display:flex;align-items:center;gap:2rem;background:var(--bg)}
+    .logo{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:4px;color:var(--accent);text-decoration:none}
+    .logo span{color:var(--accent2)}
+    nav a{font-size:0.68rem;color:var(--muted);text-decoration:none;letter-spacing:1px;text-transform:uppercase}
+    nav a:hover{color:var(--accent)}
+    .hero{max-width:860px;margin:3.5rem auto 2rem;padding:0 2rem;text-align:center}
+    .hero h1{font-family:'Bebas Neue',sans-serif;font-size:5rem;letter-spacing:4px;line-height:1}
+    .hero h1 span{color:var(--accent)}
+    .hero p{color:var(--muted);font-size:0.78rem;line-height:1.9;margin:1.2rem auto;max-width:600px}
+    .cta-row{display:flex;gap:1rem;justify-content:center;margin-top:1.8rem;flex-wrap:wrap}
+    .btn-primary{background:var(--accent);color:#fff;font-family:'Space Mono',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:1rem 2rem;border:none;cursor:pointer;border-radius:var(--radius-sm);transition:.2s}
+    .btn-primary:hover{background:var(--accent2)}
+    .btn-secondary{background:transparent;color:var(--text);font-family:'Space Mono',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:1rem 2rem;border:1px solid var(--border);cursor:pointer;border-radius:var(--radius-sm);transition:.2s}
+    .btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+    .rules{max-width:900px;margin:0 auto 4rem;padding:0 2rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+    .rule-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem}
+    .rule-card h3{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;margin-bottom:.8rem;color:var(--accent)}
+    .rule-card p,.rule-card li{font-size:.72rem;color:var(--muted);line-height:1.8}
+    .rule-card ol{padding-left:1.2rem}
+    .rule-card li{margin-bottom:.3rem}
+    .rule-card strong{color:var(--text)}
 
-    .hero { max-width:860px; margin:3.5rem auto 2rem; padding:0 2rem; text-align:center; }
-    .hero h1 { font-family:'Bebas Neue',sans-serif; font-size:5rem; letter-spacing:4px; line-height:1; }
-    .hero h1 span { color:var(--accent); }
-    .hero p { color:var(--muted); font-size:0.78rem; line-height:1.9; margin:1.2rem auto; max-width:600px; }
-    .cta-row { display:flex; gap:1rem; justify-content:center; margin-top:1.8rem; flex-wrap:wrap; }
-    .btn-primary { background:var(--accent); color:#fff; font-family:'Space Mono',monospace; font-size:0.78rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:1rem 2rem; border:none; cursor:pointer; border-radius:var(--radius-sm); transition:0.2s; }
-    .btn-primary:hover { background:var(--accent2); }
-    .btn-secondary { background:transparent; color:var(--text); font-family:'Space Mono',monospace; font-size:0.78rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:1rem 2rem; border:1px solid var(--border); cursor:pointer; border-radius:var(--radius-sm); transition:0.2s; }
-    .btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+    /* ── MODAL ── */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(30,16,48,.45);backdrop-filter:blur(6px);z-index:100;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:2.5rem;width:500px;max-width:100%;box-shadow:0 12px 48px rgba(118,73,118,.18);margin:auto}
+    .modal h2{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;margin-bottom:1.5rem}
+    .modal h2 span{color:var(--accent)}
+    .form-group{margin-bottom:1rem}
+    .form-group label{display:block;font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+    .form-group input,.form-group select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Space Mono',monospace;font-size:.85rem;padding:.7rem 1rem;outline:none;transition:.2s}
+    .form-group input:focus,.form-group select:focus{border-color:var(--accent);background:var(--bg)}
 
-    .rules { max-width:900px; margin:0 auto 4rem; padding:0 2rem; display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
-    .rule-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; }
-    .rule-card h3 { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:2px; margin-bottom:0.8rem; color:var(--accent); }
-    .rule-card p, .rule-card li { font-size:0.72rem; color:var(--muted); line-height:1.8; }
-    .rule-card ol { padding-left:1.2rem; }
-    .rule-card li { margin-bottom:0.3rem; }
-    .rule-card strong { color:var(--text); }
+    /* category picker */
+    .cat-section{margin-bottom:1rem}
+    .cat-section-label{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between}
+    .cat-section-label button{font-family:'Space Mono',monospace;font-size:.55rem;background:transparent;border:1px solid var(--border);border-radius:999px;color:var(--muted);padding:.15rem .5rem;cursor:pointer;transition:.2s}
+    .cat-section-label button:hover{border-color:var(--accent);color:var(--accent)}
+    .cat-grid{display:flex;flex-wrap:wrap;gap:.4rem;min-height:36px}
+    .cat-chip{display:flex;align-items:center;gap:.3rem;background:var(--surface);border:1.5px solid var(--border);border-radius:999px;padding:.25rem .7rem;font-size:.62rem;cursor:pointer;transition:.2s;user-select:none}
+    .cat-chip:hover{border-color:var(--accent2);color:var(--accent2)}
+    .cat-chip.selected{background:rgba(118,73,118,.1);border-color:var(--accent);color:var(--accent);font-weight:700}
+    .cat-chip .dot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:.2s}
+    .cat-chip.selected .dot{background:var(--accent)}
+    .cat-loading{font-size:.65rem;color:var(--muted);font-style:italic}
+    .cat-hint{font-size:.6rem;color:var(--muted);margin-top:.4rem}
+    .cat-count{font-size:.6rem;color:var(--accent);font-weight:700}
 
-    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(30,16,48,0.45); backdrop-filter:blur(6px); z-index:100; align-items:center; justify-content:center; }
-    .modal-overlay.open { display:flex; }
-    .modal { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:2.5rem; width:420px; max-width:95vw; box-shadow:0 12px 48px rgba(118,73,118,0.18); }
-    .modal h2 { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:3px; margin-bottom:1.5rem; }
-    .modal h2 span { color:var(--accent); }
-    .form-group { margin-bottom:1rem; }
-    .form-group label { display:block; font-size:0.62rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem; }
-    .form-group input, .form-group select { width:100%; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:'Space Mono',monospace; font-size:0.85rem; padding:0.7rem 1rem; outline:none; transition:0.2s; }
-    .form-group input:focus, .form-group select:focus { border-color:var(--accent); background:var(--bg); }
-    .modal-actions { display:flex; gap:0.8rem; margin-top:1.5rem; }
-    .modal-actions .btn-primary { flex:1; }
-    .btn-cancel { background:transparent; border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--muted); font-family:'Space Mono',monospace; font-size:0.72rem; padding:0.7rem 1rem; cursor:pointer; transition:0.2s; }
-    .btn-cancel:hover { border-color:var(--accent2); color:var(--accent2); }
-    .error-msg { color:var(--accent2); font-size:0.68rem; margin-top:0.8rem; display:none; }
+    .modal-actions{display:flex;gap:.8rem;margin-top:1.5rem}
+    .modal-actions .btn-primary{flex:1}
+    .btn-cancel{background:transparent;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted);font-family:'Space Mono',monospace;font-size:.72rem;padding:.7rem 1rem;cursor:pointer;transition:.2s}
+    .btn-cancel:hover{border-color:var(--accent2);color:var(--accent2)}
+    .error-msg{color:var(--accent2);font-size:.68rem;margin-top:.8rem;display:none}
 
-    @media (max-width:600px) { .hero h1{font-size:3rem;} .rules{grid-template-columns:1fr;} header{padding:1rem 1.2rem;} }
+    @media(max-width:600px){.hero h1{font-size:3rem}.rules{grid-template-columns:1fr}header{padding:1rem 1.2rem}}
   </style>
 </head>
 <body>
@@ -75,17 +86,17 @@
   <div class="rules">
     <div class="rule-card">
       <h3>Drawing Turn</h3>
-      <p>When it's your turn, choose one of three words to draw. Use the canvas to draw your word — <strong>no letters or numbers!</strong> You have 80 seconds. The more players guess correctly, the more points you earn too.</p>
+      <p>When it's your turn, choose one of three words to draw. Use the canvas to draw your word — <strong>no letters or numbers!</strong> You have 40 seconds. The more players guess correctly, the more points you earn too.</p>
     </div>
     <div class="rule-card">
       <h3>Guessing Turn</h3>
-      <p>Watch the drawing unfold in real time and type your guess in the chat. You only see the <strong>word category</strong> as a hint. Guess faster to score more points — up to 100 per round!</p>
+      <p>Watch the drawing unfold in real time and type your guess in the chat — <strong>in French or English!</strong> You only see the <strong>word category</strong> as a hint. Guess faster to score more points — up to 100 per round!</p>
     </div>
     <div class="rule-card">
       <h3>How to Start</h3>
       <ol>
         <li>Click <strong>Create New Game</strong></li>
-        <li>Choose how many rounds to play</li>
+        <li>Choose rounds &amp; categories</li>
         <li>Share your 6-letter code with friends</li>
         <li>Everyone joins with the code</li>
         <li>Host starts when everyone is ready</li>
@@ -97,7 +108,7 @@
     </div>
   </div>
 
-  <!-- Create Modal -->
+  <!-- ── CREATE MODAL ── -->
   <div class="modal-overlay" id="createModal">
     <div class="modal">
       <h2>CREATE <span>GAME</span></h2>
@@ -114,6 +125,22 @@
           <option value="10">10 rounds</option>
         </select>
       </div>
+
+      <!-- Category picker -->
+      <div class="cat-section">
+        <div class="cat-section-label">
+          <span>Word Categories <span class="cat-count" id="catCount">(all)</span></span>
+          <div style="display:flex;gap:.4rem">
+            <button onclick="selectAllCats()">Select all</button>
+            <button onclick="clearAllCats()">Clear all</button>
+          </div>
+        </div>
+        <div class="cat-grid" id="catGrid">
+          <span class="cat-loading">Loading categories…</span>
+        </div>
+        <div class="cat-hint">Leave all unselected to use every category.</div>
+      </div>
+
       <div class="error-msg" id="createError"></div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal('create')">Cancel</button>
@@ -122,7 +149,7 @@
     </div>
   </div>
 
-  <!-- Join Modal -->
+  <!-- ── JOIN MODAL ── -->
   <div class="modal-overlay" id="joinModal">
     <div class="modal">
       <h2>JOIN <span>GAME</span></h2>
@@ -143,35 +170,118 @@
   </div>
 
   <script>
-    function openModal(t){document.getElementById(t+'Modal').classList.add('open');setTimeout(()=>document.getElementById(t==='create'?'createName':'joinCode').focus(),80);}
-    function closeModal(t){document.getElementById(t+'Modal').classList.remove('open');}
-    document.getElementById('createName').addEventListener('keydown',e=>{if(e.key==='Enter')createGame();});
-    document.getElementById('joinName').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame();});
-    document.getElementById('joinCode').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase();});
-    async function createGame(){
-      const name=document.getElementById('createName').value.trim();
-      const rounds=document.getElementById('createRounds').value;
-      const err=document.getElementById('createError');
-      if(!name){showError(err,'Please enter your name.');return;}
-      err.style.display='none';
-      const res=await fetch('/games/picturize/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({playerName:name,totalRounds:rounds})});
-      const data=await res.json();
-      if(data.success){sessionStorage.setItem('playerName',name);window.location.href='/games/picturize/game/'+data.gameCode;}
-      else showError(err,data.error);
+    let allCategories = [];
+    let selectedCategories = new Set();
+
+    // ── Load categories from DB ───────────────────────────────────────────────
+    async function loadCategories() {
+      try {
+        const res  = await fetch('/games/picturize/categories');
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+        allCategories = data.categories;
+        renderCatGrid();
+      } catch (err) {
+        document.getElementById('catGrid').innerHTML = '<span class="cat-loading">Could not load categories.</span>';
+      }
     }
-    async function joinGame(){
-      const code=document.getElementById('joinCode').value.trim().toUpperCase();
-      const name=document.getElementById('joinName').value.trim();
-      const err=document.getElementById('joinError');
-      if(code.length<4){showError(err,'Please enter a valid game code.');return;}
-      if(!name){showError(err,'Please enter your name.');return;}
-      err.style.display='none';
-      const res=await fetch('/games/picturize/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gameCode:code,playerName:name})});
-      const data=await res.json();
-      if(data.success){sessionStorage.setItem('playerName',name);window.location.href='/games/picturize/game/'+data.gameCode;}
-      else showError(err,data.error);
+
+    function renderCatGrid() {
+      const grid = document.getElementById('catGrid');
+      if (allCategories.length === 0) {
+        grid.innerHTML = '<span class="cat-loading">No categories found in the database.</span>';
+        return;
+      }
+      grid.innerHTML = allCategories.map(cat =>
+        `<div class="cat-chip ${selectedCategories.has(cat) ? 'selected' : ''}" onclick="toggleCat('${cat}')">
+          <span class="dot"></span>${cat}
+        </div>`
+      ).join('');
+      updateCatCount();
     }
-    function showError(el,msg){el.textContent=msg;el.style.display='block';}
+
+    function toggleCat(cat) {
+      if (selectedCategories.has(cat)) selectedCategories.delete(cat);
+      else selectedCategories.add(cat);
+      renderCatGrid();
+    }
+
+    function selectAllCats() {
+      allCategories.forEach(c => selectedCategories.add(c));
+      renderCatGrid();
+    }
+
+    function clearAllCats() {
+      selectedCategories.clear();
+      renderCatGrid();
+    }
+
+    function updateCatCount() {
+      const el = document.getElementById('catCount');
+      if (selectedCategories.size === 0) el.textContent = '(all)';
+      else if (selectedCategories.size === allCategories.length) el.textContent = '(all selected)';
+      else el.textContent = '(' + selectedCategories.size + ' selected)';
+    }
+
+    // ── Modal helpers ─────────────────────────────────────────────────────────
+    function openModal(type) {
+      document.getElementById(type + 'Modal').classList.add('open');
+      if (type === 'create') {
+        loadCategories();
+        setTimeout(() => document.getElementById('createName').focus(), 80);
+      } else {
+        setTimeout(() => document.getElementById('joinCode').focus(), 80);
+      }
+    }
+    function closeModal(type) { document.getElementById(type + 'Modal').classList.remove('open'); }
+
+    document.getElementById('createName').addEventListener('keydown', e => { if(e.key==='Enter') createGame(); });
+    document.getElementById('joinName').addEventListener('keydown',   e => { if(e.key==='Enter') joinGame(); });
+    document.getElementById('joinCode').addEventListener('input',     e => { e.target.value = e.target.value.toUpperCase(); });
+
+    // ── Create game ───────────────────────────────────────────────────────────
+    async function createGame() {
+      const name   = document.getElementById('createName').value.trim();
+      const rounds = document.getElementById('createRounds').value;
+      const err    = document.getElementById('createError');
+      if (!name) { showError(err, 'Please enter your name.'); return; }
+      err.style.display = 'none';
+
+      const cats = selectedCategories.size > 0 ? [...selectedCategories] : [];
+
+      const res  = await fetch('/games/picturize/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerName: name, totalRounds: rounds, selectedCategories: cats })
+      });
+      const data = await res.json();
+      if (data.success) {
+        sessionStorage.setItem('playerName', name);
+        window.location.href = '/games/picturize/game/' + data.gameCode;
+      } else { showError(err, data.error); }
+    }
+
+    // ── Join game ─────────────────────────────────────────────────────────────
+    async function joinGame() {
+      const code = document.getElementById('joinCode').value.trim().toUpperCase();
+      const name = document.getElementById('joinName').value.trim();
+      const err  = document.getElementById('joinError');
+      if (code.length < 4) { showError(err, 'Please enter a valid game code.'); return; }
+      if (!name)           { showError(err, 'Please enter your name.'); return; }
+      err.style.display = 'none';
+      const res  = await fetch('/games/picturize/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gameCode: code, playerName: name })
+      });
+      const data = await res.json();
+      if (data.success) {
+        sessionStorage.setItem('playerName', name);
+        window.location.href = '/games/picturize/game/' + data.gameCode;
+      } else { showError(err, data.error); }
+    }
+
+    function showError(el, msg) { el.textContent = msg; el.style.display = 'block'; }
   </script>
 </body>
 </html>
