@@ -7,7 +7,7 @@ const Game               = require('./models/Game');
 const PicturizeGame      = require('./models/PicturizeGame');
 const Word               = require('./models/Word');
 const { generatePuzzle, generateCode } = require('./utils/puzzle');
-const { translateToEnglish }           = require('./utils/translate');
+const { isGuessCorrect }               = require('./utils/translate');
 
 const app    = express();
 const server = http.createServer(app);
@@ -179,17 +179,17 @@ pNamespace.on('connection', (socket) => {
     if (!round || round.drawerName === playerName) return;
     if (round.guessedBy.find(g => g.playerName === playerName)) return;
 
-    // Prioritize direct match first, translate only if needed
+    // 1. Direct match first (instant, no API call)
+    // 2. If no direct match: translate + synonym check
     const rawMatch = guess.trim().toLowerCase() === round.word.toLowerCase();
-    let translated  = guess;
-    let wasTranslated = false;
+    let correct      = rawMatch;
+    let translatedTo = null;
 
     if (!rawMatch) {
-      translated    = await translateToEnglish(guess);
-      wasTranslated = translated.trim().toLowerCase() !== guess.trim().toLowerCase();
+      const result = await isGuessCorrect(guess, round.word);
+      correct      = result.correct;
+      translatedTo = result.translatedTo;
     }
-
-    const correct = rawMatch || translated.trim().toLowerCase() === round.word.toLowerCase();
 
     if (correct) {
       const elapsed = (Date.now() - new Date(round.startedAt).getTime()) / 1000;
@@ -205,11 +205,10 @@ pNamespace.on('connection', (socket) => {
 
       await game.save();
 
-      // Tell the guesser what their guess translated to (only if translation was used)
       pNamespace.to(gameCode).emit('correctGuess', {
         playerName, points,
         originalGuess: guess,
-        translatedTo:  wasTranslated ? translated : null,
+        translatedTo,
         players: game.players.map(p => ({ name: p.name, score: p.score }))
       });
 
@@ -219,10 +218,9 @@ pNamespace.on('connection', (socket) => {
         await endRound(gameCode, true);
       }
     } else {
-      // Broadcast wrong guess — show translation if one was attempted
       pNamespace.to(gameCode).emit('wrongGuess', {
         playerName, guess,
-        translatedTo: wasTranslated ? translated : null
+        translatedTo
       });
     }
   });
