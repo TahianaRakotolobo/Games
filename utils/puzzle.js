@@ -57,7 +57,7 @@ function buildGrid(wordStrings, size = 15) {
   return { grid, words: placedWords };
 }
 
-async function generatePuzzle({ count = 15, category = null } = {}) {
+async function generatePuzzle({ count = 30, category = null } = {}) {
   const mongoose = require('mongoose');
   console.log('[puzzle] Querying database:', mongoose.connection.name);
   console.log('[puzzle] Collection: words');
